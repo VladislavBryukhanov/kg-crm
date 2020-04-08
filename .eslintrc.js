@@ -1,5 +1,5 @@
 module.exports = {
-  root: false, // FIXME disable lint
+  root: true,
   env: {
     node: true
   },
@@ -12,7 +12,6 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
-    "semi": [1, "always"],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
   }
