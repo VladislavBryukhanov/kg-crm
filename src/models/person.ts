@@ -70,7 +70,7 @@ export const positionOptions: Option[] = [
   },
   {
     value: Position.CO_FOUNDER,
-    label: 'Senior developer',
+    label: 'Co-Founder',
   },
 ];
 

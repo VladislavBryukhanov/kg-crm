@@ -52,16 +52,20 @@
           clerable
         ></v-text-field>
         <v-select
-          :items="departmentOptions"
-          v-model="person.department"
           label="Department"
           prepend-icon="apartment"
+          item-text="label"
+          item-value="value"
+          :items="departmentOptions"
+          v-model="person.department"
         ></v-select>
         <v-select
-          :items="positionOptions"
-          v-model="person.position"
           label="Position"
           prepend-icon="business_center"
+          item-text="label"
+          item-value="value"
+          :items="positionOptions"
+          v-model="person.position"
         ></v-select>
         <vuetify-date-picker
           label="Hiring date"
@@ -74,6 +78,18 @@
         ></v-textarea>
       </v-col>
     </v-row>
+
+    <v-btn 
+      fab
+      fixed
+      dark
+      bottom
+      right
+      color="primary"
+      @click="onSave"
+    >
+      <v-icon>done_outline</v-icon>
+    </v-btn>
   </v-container>
 </template>
 
@@ -89,5 +105,9 @@
 
     departmentOptions = departmentOptions;
     positionOptions = positionOptions;
+
+    onSave() {
+      console.log('Save user');
+    }
   }
 </script>

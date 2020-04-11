@@ -58,18 +58,12 @@
 
     positionLabel(position: Position): string{
       const option = positionOptions.find(({ value }) => value === position);
-      if (option) {
-        return option.label;
-      }
-      return  '';
+      return  option ? option.label : '';
     }
 
     departmentLabel(department: Department): string {
       const option = departmentOptions.find(({ value }) => value === department);
-      if (option) {
-        return option.label;
-      }
-      return  '';
+      return  option ? option.label : '';
     }
   }
 </script>
