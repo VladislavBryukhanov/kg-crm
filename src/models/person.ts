@@ -23,6 +23,11 @@ export interface PersonPrivateInfo {
   unpaidDays: number;
 }
 
+export interface Option {
+  value: string;
+  label: string;
+}
+
 export enum Position {
   JUNIOR_DEVELOPER = 'junior_dev',
   MIDDLE_DEVELOPER = 'middle_dev',
@@ -37,3 +42,45 @@ export enum Department {
   JAVASCRIPT = 'JS',
   PHP = 'PHP',
 }
+
+export const positionOptions: Option[] = [
+  {
+    value: Position.JUNIOR_DEVELOPER,
+    label: 'Junior developer',
+  },
+  {
+    value: Position.MIDDLE_DEVELOPER,
+    label: 'Middle developer',
+  },
+  {
+    value: Position.SENIOR_DEVELOPER,
+    label: 'Senior developer',
+  },
+  {
+    value: Position.TEAM_LEAD,
+    label: 'Team lead',
+  },
+  {
+    value: Position.PROJECT_MANAGER,
+    label: 'Project manager',
+  },
+  {
+    value: Position.HUMAN_RESOURCES,
+    label: 'Human resources manager',
+  },
+  {
+    value: Position.CO_FOUNDER,
+    label: 'Senior developer',
+  },
+];
+
+export const departmentOptions: Option[] = [
+  {
+    value: Department.JAVASCRIPT,
+    label: 'JavaScript',
+  },
+  {
+    value: Department.PHP,
+    label: 'PHP',
+  },
+];

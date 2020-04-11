@@ -6,37 +6,7 @@
         :key="user.id"
         :cols="6"
       >
-        <v-card max-width="320">
-          <v-img
-            class="white--text align-end"
-            :src="user.avatarUrl"
-          >
-            <v-card-title>{{user.fullName}}</v-card-title>
-          </v-img>
-
-          <v-card-text>
-            <v-list two-line>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>{{departmentLabel(user.department)}}</v-list-item-title>
-                  <v-list-item-subtitle>Department</v-list-item-subtitle>
-                </v-list-item-content>
-
-                <v-list-item-content class="text-right">
-                  <v-list-item-title>{{positionLabel(user.position)}}</v-list-item-title>
-                  <v-list-item-subtitle>Position</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-list-item>
-                <v-list-item-content class="text-center">
-                  <v-list-item-title>{{user.hiredAt | date('DD MMMM YYYY')}}</v-list-item-title>
-                  <v-list-item-subtitle>Hiring date</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
+        <person-card maxWidth="320" :person="user"></person-card>
       </v-col>
     </v-row>
   </v-container>
@@ -45,8 +15,9 @@
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
   import { Person, Position, Department } from '@/models/person';
+  import PersonCard from '@/components/PersonCard.vue';
 
-  @Component
+  @Component({ components: { PersonCard } })
   export default class NavDrawer extends Vue {
     users: Person[] = [
       { 
@@ -95,24 +66,5 @@
         developmentPlan: 'To learn AWS, React Native'
       }
     ];
-
-    positionLabel(position: Position): string {
-      return {
-        [Position.JUNIOR_DEVELOPER]: 'Junior developer',
-        [Position.MIDDLE_DEVELOPER]: 'Middle developer',
-        [Position.SENIOR_DEVELOPER]: 'Senior developer',
-        [Position.TEAM_LEAD]: 'Team lead',
-        [Position.PROJECT_MANAGER]: 'Project manager',
-        [Position.HUMAN_RESOURCES]: 'Human resources manager',
-        [Position.CO_FOUNDER]: 'Senior developer',
-      }[position]
-    }
-
-    departmentLabel(department: Department): string {
-      return {
-        [Department.JAVASCRIPT]: 'JavaScript',
-        [Department.PHP]: 'PHP',
-      }[department]
-    }
   }
 </script>
