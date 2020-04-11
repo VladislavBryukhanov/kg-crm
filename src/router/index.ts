@@ -8,6 +8,22 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'SignIn',
     component: () => import('@/pages/SignIn.vue')
+  },
+  {
+    path: '/overview',
+    name: 'overview',
+    component: () => import('@/components/NavDrawer.vue'),
+    children: [
+      {
+        path: '',
+        redirect: '/users',
+      },
+      {
+        path: '/users',
+        name: 'Users',
+        component: () => import('@/pages/UserList.vue'),
+      }
+    ]
   }
 ];
 
