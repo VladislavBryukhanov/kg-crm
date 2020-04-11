@@ -23,17 +23,16 @@
                 </v-list-item-content>
 
                 <v-list-item-content class="text-right">
-                    <v-list-item-title>{{positionLabel(user.position)}}</v-list-item-title>
-                    <v-list-item-subtitle>Position</v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
+                  <v-list-item-title>{{positionLabel(user.position)}}</v-list-item-title>
+                  <v-list-item-subtitle>Position</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
 
-                <v-list-item>
-                  <v-list-item-content class="text-center">
-                    <v-list-item-title>{{user.hiredAt}}</v-list-item-title>
-                    <v-list-item-subtitle>Hired date</v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
+              <v-list-item>
+                <v-list-item-content class="text-center">
+                  <v-list-item-title>{{user.hiredAt | date('DD MMMM YYYY')}}</v-list-item-title>
+                  <v-list-item-subtitle>Hiring date</v-list-item-subtitle>
+                </v-list-item-content>
               </v-list-item>
             </v-list>
           </v-card-text>

@@ -16,12 +16,23 @@ const routes: Array<RouteConfig> = [
     children: [
       {
         path: '',
-        redirect: '/users',
+        redirect: '/persons',
       },
       {
-        path: '/users',
+        path: '/persons',
         name: 'Users',
         component: () => import('@/pages/UserList.vue'),
+      },
+      {
+        path: '/new-person',
+        name: 'CreatePerson',
+        component: () => import('@/pages/PersonConstructor.vue'),
+      },
+      {
+        path: '/edit-person',
+        name: 'EditPerson',
+        // ... some meta data
+        component: () => import('@/pages/PersonConstructor.vue'),
       }
     ]
   }

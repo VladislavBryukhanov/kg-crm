@@ -7,7 +7,7 @@
       v-model="drawer"
       :mini-variant.sync="mini"
     >
-      <v-list-item class="px-2">
+      <v-list-item class="px-2" link @click="goToEditProfile">
         <v-list-item-avatar>
           <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
         </v-list-item-avatar>
@@ -45,7 +45,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
 
   @Component
@@ -56,13 +56,12 @@
       { 
         title: 'User list',
         icon: 'supervised_user_circle',
-        action: () => this.$router.push({ name: 'Users' }),
-
+        action: () => this.navigateTo('/persons'),
       },
       { 
         title: 'Vacation',
         icon: 'today',
-        action: () => this.$router.push({ name: '' }),
+        action: () => this.navigateTo('/'),
       },
       { 
         title: 'Sign out',
@@ -70,6 +69,16 @@
         action: this.signOut,
       }
     ];
+
+    goToEditProfile() {
+      console.log(this.mini);
+      if (this.mini) return;
+      this.navigateTo('/edit-person');
+    }
+
+    navigateTo(path: string) {
+      this.$router.push(path)
+    }
 
     signOut() {
       console.log('sign Out');

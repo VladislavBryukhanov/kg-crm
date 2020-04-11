@@ -1,17 +1,26 @@
-export interface Person {
-  id: string;
+export interface Person extends PersonPrivateInfo {
+  id?: string;
   fullName: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   hiredAt: string;
   position: Position;
   department: Department;
-  attachedTo: string; //Link to person
+  attachedTo?: string; //TODO Link to person
+  corporateMail?: string;
+
+  additionInfo?: string;
+  developmentPlan: string;
+}
+
+export interface PersonPrivateInfo {
+  gmail?: string;
+  phone?: string;
+  birthday?: string;
+  address?: string;
 
   vacationDays: number;
   sickLeaveDays: number;
   unpaidDays: number;
-
-  developmentPlan: string;
 }
 
 export enum Position {

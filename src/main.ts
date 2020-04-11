@@ -2,9 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import vuetify from '@/core/vuetify'
 import '@/api/firebase.config';
-import vuetify from '@/vuetify'
-import 'vuetify/dist/vuetify.min.css';
+import '@/core/filters';
 
 Vue.config.productionTip = false;
 
