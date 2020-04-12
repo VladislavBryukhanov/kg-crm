@@ -7,12 +7,19 @@
       v-model="drawer"
       :mini-variant.sync="mini"
     >
-      <v-list-item class="px-2" link @click="goToEditProfile">
+      <v-list-item 
+        class="px-2"
+        link
+        v-if="profile"
+        @click="goToEditProfile"
+      >
         <v-list-item-avatar>
-          <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+          <v-img :src="avatar"></v-img>
         </v-list-item-avatar>
 
-        <v-list-item-title class="subtitle-1">John Leider</v-list-item-title>
+        <v-list-item-title class="subtitle-1">
+          {{profile.fullName}}
+        </v-list-item-title>
 
         <v-btn icon @click.stop="mini = !mini">
           <v-icon>chevron_left</v-icon>
@@ -48,15 +55,22 @@
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
   import { SIGN_OUT } from '@/store/action-types';
-  import { mapActions } from 'vuex';
+  import { mapActions, mapState } from 'vuex';
+  import * as workerImg from '@/assets/worker.png';
+  import { Person } from '@/models/person';
+  import { RootState } from '@/models/store';
 
   @Component({ 
     methods: mapActions({
       signOutAction: SIGN_OUT
+    }),
+    computed: mapState<RootState>({
+      profile: (state: RootState) => state.AuthModule.me
     })
   })
   export default class NavDrawer extends Vue {
     signOutAction!: () => Promise<void>;
+    profile?: Person;
 
     mini = true;
     drawer = true;
@@ -78,6 +92,10 @@
       }
     ];
 
+    get avatar() {
+      return this.profile && this.profile.avatarUrl || workerImg;
+    }
+
     goToEditProfile() {
       if (!this.mini) {
         this.navigateTo('/edit-person');
@@ -90,7 +108,7 @@
 
     async signOut() {
       await this.signOutAction();
-      this.$router.push({ name: 'SignIn' });
+      this.navigateTo('/auth');
     }
   }
 </script>

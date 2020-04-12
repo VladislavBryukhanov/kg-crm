@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row v-if="persons">
       <v-col
-         v-for="user in users" 
-        :key="user.id"
+         v-for="person in persons" 
+        :key="person.id"
         :cols="6"
       >
-        <person-card maxWidth="320" :person="user"></person-card>
+        <person-card maxWidth="320" :person="person"></person-card>
       </v-col>
     </v-row>
   </v-container>
@@ -14,57 +14,26 @@
 
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
+  import { mapActions, mapState } from 'vuex';
   import { Person, Position, Department } from '@/models/person';
   import PersonCard from '@/components/PersonCard.vue';
+  import { LIST_PERSONS } from '@/store/action-types';
+  import { RootState } from '@/models/store';
 
-  @Component({ components: { PersonCard } })
+  @Component({ 
+    components: { PersonCard },
+    computed: mapState<RootState>({
+      persons: (state: RootState) => state.PersonModule.persons
+    }),
+    methods: mapActions({
+      listPersons: LIST_PERSONS
+    })
+  })
   export default class NavDrawer extends Vue {
-    users: Person[] = [
-      { 
-        id: '1',
-        fullName: 'Vladislav Bryukhanov',
-        avatarUrl: 'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
-        hiredAt: new Date().toISOString(),
-        position: Position.MIDDLE_DEVELOPER,
-        department: Department.JAVASCRIPT,
-        attachedTo: '???',
-
-        vacationDays: 12,
-        sickLeaveDays: 15,
-        unpaidDays: 0,
-
-        developmentPlan: 'To learn AWS, React Native'
-      },
-      { 
-        id: '2',
-        fullName: 'Vladislav Bryukhanov',
-        avatarUrl: 'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
-        hiredAt: new Date().toISOString(),
-        position: Position.MIDDLE_DEVELOPER,
-        department: Department.JAVASCRIPT,
-        attachedTo: '???',
-
-        vacationDays: 12,
-        sickLeaveDays: 15,
-        unpaidDays: 0,
-
-        developmentPlan: 'To learn AWS, React Native'
-      },
-      { 
-        id: '3',
-        fullName: 'Vladislav Bryukhanov',
-        avatarUrl: 'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
-        hiredAt: new Date().toISOString(),
-        position: Position.MIDDLE_DEVELOPER,
-        department: Department.JAVASCRIPT,
-        attachedTo: '???',
-
-        vacationDays: 12,
-        sickLeaveDays: 15,
-        unpaidDays: 0,
-
-        developmentPlan: 'To learn AWS, React Native'
-      }
-    ];
+    listPersons!: () => Promise<void>;
+    
+    created() {
+      this.listPersons();
+    }
   }
 </script>

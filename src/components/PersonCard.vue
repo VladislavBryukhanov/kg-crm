@@ -31,6 +31,16 @@
             <v-list-item-subtitle>Hiring date</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
+        
+        <v-list-item>
+          <v-list-item-content class="text-center">
+            <v-list-item-title v-if="person.corporateMail">
+              {{person.corporateMail}}
+            </v-list-item-title>
+            <v-list-item-subtitle>Corporate email</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+        
       </v-list>
     </v-card-text>
   </v-card>
