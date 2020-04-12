@@ -1,47 +1,37 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter from 'vue-router'
+import routes from './routes';
+import store from '@/store';
+import { CHECK_AUTH } from '@/store/action-types';
+import { AuthMode } from '@/models/store';
 
 Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
-  {
-    path: '/',
-    name: 'SignIn',
-    component: () => import('@/pages/SignIn.vue')
-  },
-  {
-    path: '/overview',
-    name: 'overview',
-    component: () => import('@/components/NavDrawer.vue'),
-    children: [
-      {
-        path: '',
-        redirect: '/persons',
-      },
-      {
-        path: '/persons',
-        name: 'Users',
-        component: () => import('@/pages/UserList.vue'),
-      },
-      {
-        path: '/new-person',
-        name: 'CreatePerson',
-        component: () => import('@/pages/PersonConstructor.vue'),
-      },
-      {
-        path: '/edit-person',
-        name: 'EditPerson',
-        // ... some meta data
-        component: () => import('@/pages/PersonConstructor.vue'),
-      }
-    ]
-  }
-];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+});
+
+router.beforeEach(async (to, from, next) => {
+  let redirectParams = {};
+  const { AuthModule } = store.state;
+
+  if (!AuthModule.authState) {
+    await store.dispatch(CHECK_AUTH);
+  }
+
+  if (to.matched.some((route => route.meta.requiredAuth))) {
+    if (AuthModule.authState === AuthMode.SIGNED_OUT) {
+      redirectParams = { name: 'SignIn' };
+    }
+  } else if (to.matched.some((route => route.meta.requiredUnauth))) {
+    if (AuthModule.authState === AuthMode.SIGNED_IN) {
+      redirectParams = { name: 'Overview' };
+    }
+  }
+
+  next(redirectParams);
 });
 
 export default router;

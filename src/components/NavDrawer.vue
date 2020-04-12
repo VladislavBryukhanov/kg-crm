@@ -47,9 +47,17 @@
 
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
+  import { SIGN_OUT } from '@/store/action-types';
+  import { mapActions } from 'vuex';
 
-  @Component
+  @Component({ 
+    methods: mapActions({
+      signOutAction: SIGN_OUT
+    })
+  })
   export default class NavDrawer extends Vue {
+    signOutAction!: () => Promise<void>;
+
     mini = true;
     drawer = true;
     items = [
@@ -71,17 +79,17 @@
     ];
 
     goToEditProfile() {
-      console.log(this.mini);
-      if (this.mini) return;
-      this.navigateTo('/edit-person');
+      if (!this.mini) {
+        this.navigateTo('/edit-person');
+      }
     }
 
     navigateTo(path: string) {
       this.$router.push(path)
     }
 
-    signOut() {
-      console.log('sign Out');
+    async signOut() {
+      await this.signOutAction();
       this.$router.push({ name: 'SignIn' });
     }
   }

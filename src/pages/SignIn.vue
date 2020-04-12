@@ -26,20 +26,16 @@
 
 <script>
 import { Component, Vue } from 'vue-property-decorator';
-import firebase from 'firebase';
+import { mapActions } from 'vuex';
+import { SIGN_IN } from '@/store/action-types';
 
-@Component
+@Component({ 
+  methods: mapActions({ signIn: SIGN_IN })
+})
 export default class SignIn extends Vue {
-  mounted() {
-    firebase.auth().onAuthStateChanged(auth => {
-      console.log('AUTH', auth);
-    });
-  }
-
-  onSignIn() {
-    const authProvider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(authProvider)
-      .then(res => console.log(res));
+  async onSignIn() {
+    await this.signIn();
+    this.$router.push({ name: 'Persons' })
   }
 }
 </script>
