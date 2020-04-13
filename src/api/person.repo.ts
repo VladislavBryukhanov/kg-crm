@@ -23,7 +23,10 @@ export class PersonRepo {
       db.collection(PERSON_COLLECTION).get()
         .then((querySnapshot) => {
           const personList: Person[] = [];
-          querySnapshot.forEach(person => personList.push(person.data() as Person));
+          querySnapshot.forEach(snapshot => {
+            const person = { id: snapshot.id, ...snapshot.data() } as Person;
+            personList.push(person);
+          });
 
           resolve(personList);
         })
@@ -31,8 +34,8 @@ export class PersonRepo {
     });
   }
 
-  static async create() {
-
+  static async create(person: Person) {
+    return db.collection(PERSON_COLLECTION).add(person);
   }
 
   static async update() {

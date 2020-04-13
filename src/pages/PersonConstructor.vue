@@ -44,6 +44,10 @@
         <v-file-input
           label="Avatar"
           prepend-icon="camera_alt"
+          accept="image/*"
+          clerable
+          :rules="rules.avatar"
+          @change="onAvatarChanged"
         ></v-file-input>
         <v-text-field 
           prepend-icon="mail_outline"
@@ -95,19 +99,49 @@
 
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
-  import { Person, positionOptions, departmentOptions } from '@/models/person';
-  import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
+  import { mapActions } from 'vuex';
+  import { CREATE_PERSON } from '@/store/action-types';
   import PersonCard from '@/components/PersonCard.vue';
+  import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
+  import { Person, positionOptions, departmentOptions } from '@/models/person';
 
-  @Component({ components: { VuetifyDatePicker, PersonCard }})
+  @Component({ 
+    components: { VuetifyDatePicker, PersonCard },
+    methods: mapActions({ createPerson: CREATE_PERSON }),
+  })
   export default class PersonConstructor extends Vue {
-    person: Partial<Person> = {};
+    createPerson!: (person: Person) => Promise<void>;
 
     departmentOptions = departmentOptions;
     positionOptions = positionOptions;
 
+    person: Partial<Person> = {
+      avatarUrl: ''
+    };
+
+    rules = {
+      avatar: [
+        (value: File) => !value || value.size < 5 * 1024 * 1024 || 'Avatar size should be less than 5 MB!'
+      ]
+    }
+
+    onAvatarChanged(file: File) {
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.person.avatarUrl = reader.result as string;
+      }
+    }
+
     onSave() {
-      console.log('Save user');
+      // TODO implement validation, avatar uploading
+      const newPerson = { ...this.person } as Person;
+      delete newPerson.avatarUrl;
+      delete newPerson.id;
+
+      this.createPerson(newPerson);
     }
   }
 </script>

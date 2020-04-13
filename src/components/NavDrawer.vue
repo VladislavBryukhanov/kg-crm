@@ -76,9 +76,14 @@
     drawer = true;
     items = [
       { 
-        title: 'User list',
+        title: 'Person list',
         icon: 'supervised_user_circle',
         action: () => this.navigateTo('/persons'),
+      },
+      {
+        title: 'Create person',
+        icon: 'person_add',
+        action: () => this.navigateTo('/new-person'),
       },
       { 
         title: 'Vacation',
