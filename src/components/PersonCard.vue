@@ -32,9 +32,9 @@
           </v-list-item-content>
         </v-list-item>
         
-        <v-list-item>
+        <v-list-item v-if="person.corporateMail">
           <v-list-item-content class="text-center">
-            <v-list-item-title v-if="person.corporateMail">
+            <v-list-item-title>
               {{person.corporateMail}}
             </v-list-item-title>
             <v-list-item-subtitle>Corporate email</v-list-item-subtitle>
