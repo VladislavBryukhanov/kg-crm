@@ -41,4 +41,8 @@ export class PersonRepo {
   static async update() {
 
   }
+
+  static async delete(personId: string) {
+    return db.collection(PERSON_COLLECTION).doc(personId).delete();
+  }
 }

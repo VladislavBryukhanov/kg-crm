@@ -5,10 +5,25 @@
       class="align-end"
       max-height="240"
       contain
-    >
-    </v-img>
-    <v-card-title class="primary--text text-capitalize">{{person.fullName}}</v-card-title>
+    ></v-img>
+    <v-card-title class="primary--text text-capitalize" style="position: relative;">
+      <v-speed-dial absolute top right v-model="fabMode">
+        <template v-slot:activator>
+          <v-btn dark fab color="primary" v-model="fabMode">
+            <v-icon v-if="fabMode">close</v-icon>
+            <v-icon v-else>build</v-icon>
+          </v-btn>
+        </template>
+        <v-btn fab dark color="red darken-2" @click="onDeletePerson">
+          <v-icon>delete</v-icon>
+        </v-btn>
+          <v-btn fab dark color="secondary">
+          <v-icon>edit</v-icon>
+        </v-btn>
+      </v-speed-dial>
 
+      {{person.fullName}}
+    </v-card-title>
     <v-card-text>
       <v-list two-line>
         <v-list-item>
@@ -48,11 +63,18 @@
 
 <script lang="ts">
   import { Vue, Component, Prop } from 'vue-property-decorator';
+  import { mapActions } from 'vuex';
   import { Option, Person, Position, Department, positionOptions, departmentOptions } from '@/models/person';
   import * as workerImg from '@/assets/worker.png';
+  import { DELETE_PERSON } from '@/store/action-types';
 
-  @Component({ name: 'person-card' })
+  @Component({ 
+    name: 'person-card',
+    methods: mapActions({ deletePerson: DELETE_PERSON })
+  })
   export default class PersonCard extends Vue {
+    deletePerson!: (personId: string) => Promise<void>;
+
     @Prop(Object)
     person!: Person;
 
@@ -66,6 +88,8 @@
     departmentOptions = departmentOptions;
     positionOptions = positionOptions;
 
+    fabMode = false;
+
     positionLabel(position: Position): string{
       const option = positionOptions.find(({ value }) => value === position);
       return  option ? option.label : '';
@@ -74,6 +98,10 @@
     departmentLabel(department: Department): string {
       const option = departmentOptions.find(({ value }) => value === department);
       return  option ? option.label : '';
+    }
+
+    onDeletePerson() {
+      this.deletePerson(this.person.id!);
     }
   }
 </script>
