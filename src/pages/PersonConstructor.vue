@@ -80,7 +80,6 @@
           ></v-select>
           <vuetify-date-picker
             label="Hiring date *"
-            :rules="rules.hiredAt"
             :date.sync="person.hiredAt"
           ></vuetify-date-picker>
           <v-textarea
@@ -92,7 +91,7 @@
       </v-row>
     </v-form>
     <v-btn
-      v-if="valid"
+      v-if="isDataValid"
       fab
       fixed
       dark
@@ -160,14 +159,15 @@
       position: [
         (v: string) => !!v || 'Position is required',
       ],
-      hiredAt: [
-        (v: string) => !!v || 'Hiring date is required',
-      ]
-    }
+    };
 
     person: Partial<Person> = {
       avatarUrl: ''
     };
+
+    get isDataValid() {
+      return this.valid && this.person.hiredAt;
+    }
 
     onAvatarChanged(file: File) {
       if (!file) return;

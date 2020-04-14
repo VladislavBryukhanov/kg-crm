@@ -33,6 +33,9 @@ export enum Position {
   MIDDLE_DEVELOPER = 'middle_dev',
   SENIOR_DEVELOPER = 'senior_dev',
   TEAM_LEAD = 'team_lead',
+  BUSINESS_ANALYTIC = 'business_analytic',
+  OFFICE_MANAGER = 'office_manager',
+  SALES_MANAGER = 'sales_manager',
   PROJECT_MANAGER = 'project_manager',
   HUMAN_RESOURCES = 'human_resources_manager',
   CO_FOUNDER = 'co_founder',
@@ -59,6 +62,18 @@ export const positionOptions: Option[] = [
   {
     value: Position.TEAM_LEAD,
     label: 'Team lead',
+  },
+  {
+    value: Position.BUSINESS_ANALYTIC,
+    label: 'Business analitic',
+  },
+  {
+    value: Position.OFFICE_MANAGER,
+    label: 'Office manager',
+  },
+  {
+    value: Position.SALES_MANAGER,
+    label: 'Sales manager',
   },
   {
     value: Position.PROJECT_MANAGER,

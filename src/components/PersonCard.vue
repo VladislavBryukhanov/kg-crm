@@ -6,12 +6,30 @@
       max-height="240"
       contain
     ></v-img>
-    <v-card-title class="primary--text text-capitalize" style="position: relative;">
-      <v-speed-dial absolute top right v-model="fabMode">
+    <v-card-title 
+      class="primary--text text-capitalize"
+      style="position: relative;"
+    >
+      <v-speed-dial
+        v-model="fabMode"
+        v-if="person.id"
+        absolute top right
+      >
         <template v-slot:activator>
-          <v-btn dark fab color="primary" v-model="fabMode">
+          <v-btn 
+            v-if="!loading"
+            v-model="fabMode"
+            color="primary" dark fab
+          >
             <v-icon v-if="fabMode">close</v-icon>
             <v-icon v-else>build</v-icon>
+          </v-btn>
+          <v-btn v-else dark fab @click.stop="" color="#1a567b9e">
+             <v-progress-circular
+              :width="3"
+              color="white"
+              indeterminate
+            ></v-progress-circular>
           </v-btn>
         </template>
         <v-btn fab dark color="red darken-2" @click="onDeletePerson">
@@ -89,19 +107,28 @@
     positionOptions = positionOptions;
 
     fabMode = false;
+    loading = false;
 
     positionLabel(position: Position): string{
       const option = positionOptions.find(({ value }) => value === position);
-      return  option ? option.label : '';
+      return option ? option.label : '';
     }
 
     departmentLabel(department: Department): string {
       const option = departmentOptions.find(({ value }) => value === department);
-      return  option ? option.label : '';
+      return option ? option.label : '';
     }
 
-    onDeletePerson() {
-      this.deletePerson(this.person.id!);
+    async onDeletePerson() {
+      const confirm = await this.$root.$data.$confirmDialog(
+        'Confirm user removing',
+        `Are you sure you want to remove ${this.person.fullName} from the list of employees`
+      );
+
+      if (confirm) {
+        this.loading = true;
+        await this.deletePerson(this.person.id!);
+      }
     }
   }
 </script>
