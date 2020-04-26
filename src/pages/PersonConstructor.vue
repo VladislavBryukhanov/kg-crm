@@ -1,7 +1,11 @@
 <template>
   <v-container>
     <v-layout justify-center>
-      <person-card maxWidth="320" :person="person"></person-card>
+      <person-card 
+        maxWidth="320"
+        :person="person"
+        :isReadonly="true"
+      ></person-card>
     </v-layout>
     <v-form v-model="valid">
       <v-row>
@@ -106,19 +110,37 @@
 </template>
 
 <script lang="ts">
-  import { Vue, Component } from 'vue-property-decorator';
-  import { mapActions } from 'vuex';
-  import { CREATE_PERSON } from '@/store/action-types';
+  import { Vue, Component, Watch } from 'vue-property-decorator';
+  import { mapActions, mapState } from 'vuex';
+  import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON } from '@/store/action-types';
   import PersonCard from '@/components/PersonCard.vue';
   import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
   import { Person, positionOptions, departmentOptions } from '@/models/person';
+  import { RootState } from '../models/store';
+  import isEqual from 'lodash.isequal';
 
   @Component({ 
     components: { VuetifyDatePicker, PersonCard },
-    methods: mapActions({ createPerson: CREATE_PERSON }),
+     computed: mapState<RootState>({
+      persons: (state: RootState) => state.PersonModule.persons
+    }),
+    methods: mapActions({ 
+      createPerson: CREATE_PERSON,
+      fetchPerson: FETCH_PERSON_BY_ID,
+      updatePerson: UPDATE_PERSON,
+    }),
   })
   export default class PersonConstructor extends Vue {
     createPerson!: (person: Person) => Promise<void>;
+    fetchPerson!: (personId: string) => Promise<void>;
+    updatePerson!: (
+      payload: { 
+        personId: string,
+        updates: Partial<Person>
+      }
+    ) => Promise<void>;
+
+    persons!: Person[];
 
     departmentOptions = departmentOptions;
     positionOptions = positionOptions;
@@ -161,12 +183,42 @@
       ],
     };
 
+    originalPerson?: Person;
+
     person: Partial<Person> = {
       avatarUrl: ''
     };
 
     get isDataValid() {
-      return this.valid && this.person.hiredAt;
+      const isFormValid =this.valid && this.person.hiredAt;
+      const isAnyUpdates = this.originalPerson && !isEqual(this.person, this.originalPerson);
+
+      return isFormValid && (!this.isEditMode || isAnyUpdates);
+    }
+
+    get isEditMode() {
+      return !!this.$router.currentRoute.params.personId;
+    }
+
+    @Watch('persons', { immediate: true, deep: true })
+    onPersonsChanged(persons: Person[], updatedPersons: Person[]) {
+      const { personId } = this.$router.currentRoute.params;
+
+      if (!personId || !persons.length) return;
+
+      this.originalPerson = persons.find(({ id }) => id === personId);
+
+      if (this.originalPerson) {
+        this.person = { ...this.originalPerson };
+      }
+    }
+
+    created() {
+      const { personId } = this.$router.currentRoute.params;
+
+      if (personId && !this.persons.find(({ id }) => id === personId)) {
+        this.fetchPerson(personId);
+      }
     }
 
     onAvatarChanged(file: File) {
@@ -185,7 +237,12 @@
       delete newPerson.avatarUrl;
       delete newPerson.id;
 
-      await this.createPerson(newPerson);
+      if (this.isEditMode) {
+        await this.updatePerson({ personId: this.person.id!, updates: newPerson });
+      } else {
+        await this.createPerson(newPerson);
+      }
+
       this.$router.go(-1);
     }
   }

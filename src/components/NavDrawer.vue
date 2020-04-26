@@ -70,7 +70,7 @@
   })
   export default class NavDrawer extends Vue {
     signOutAction!: () => Promise<void>;
-    profile?: Person;
+    profile!: Person;
 
     mini = true;
     drawer = true;
@@ -103,7 +103,7 @@
 
     goToEditProfile() {
       if (!this.mini) {
-        this.navigateTo('/edit-person');
+        this.$router.push({ name: 'EditPerson', params: { personId: this.profile.id! } });
       }
     }
 

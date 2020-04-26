@@ -28,9 +28,8 @@ const routes: Array<RouteConfig> = [
         component: () => import('@/pages/PersonConstructor.vue'),
       },
       {
-        path: '/edit-person',
+        path: '/edit-person/:personId',
         name: 'EditPerson',
-        // ... some meta data
         component: () => import('@/pages/PersonConstructor.vue'),
       }
     ]

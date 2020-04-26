@@ -12,7 +12,7 @@
     >
       <v-speed-dial
         v-model="fabMode"
-        v-if="person.id"
+        v-if="!isReadonly && person.id"
         absolute top right
       >
         <template v-slot:activator>
@@ -35,7 +35,7 @@
         <v-btn fab dark color="red darken-2" @click="onDeletePerson">
           <v-icon>delete</v-icon>
         </v-btn>
-          <v-btn fab dark color="secondary">
+          <v-btn fab dark color="secondary" @click="navigateToEditPerson">
           <v-icon>edit</v-icon>
         </v-btn>
       </v-speed-dial>
@@ -99,6 +99,9 @@
     @Prop(String)
     maxWidth!: string;
 
+    @Prop(Boolean)
+    isReadonly?: boolean;
+
     get avatar() {
       return this.person.avatarUrl || workerImg;
     }
@@ -129,6 +132,10 @@
         this.loading = true;
         await this.deletePerson(this.person.id!);
       }
+    }
+
+    navigateToEditPerson() {
+      this.$router.push({ name: 'EditPerson', params: { personId: this.person.id! } });
     }
   }
 </script>
