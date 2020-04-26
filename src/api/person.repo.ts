@@ -42,11 +42,14 @@ export class PersonRepo {
     });
   }
 
-  static async create(person: Person) {
-    return db.collection(PERSON_COLLECTION).add(person);
+  static async create(person: Person): Promise<Person> {
+    const personSnapshot = await db.collection(PERSON_COLLECTION).add(person)
+      .then(snapshot => snapshot.get());
+
+    return this.snapshotToPerson(personSnapshot);
   }
 
-  static async update(personId: string, updates: Partial<Person>) {
+  static async update(personId: string, updates: Partial<Person>): Promise<void> {
     return db.collection(PERSON_COLLECTION).doc(personId).update(updates);
   }
 

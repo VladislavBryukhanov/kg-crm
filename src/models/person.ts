@@ -2,6 +2,7 @@ export interface Person extends PersonPrivateInfo {
   id?: string;
   fullName: string;
   avatarUrl?: string;
+  avatarFileId?: string;
   hiredAt: string;
   position: Position;
   department: Department;

@@ -1,3 +1,4 @@
+import { FileRepo } from '@/api/file.repo';
 import { ActionTree } from 'vuex';
 import firebase from 'firebase';
 import { AuthState, RootState } from '@/models/store';
@@ -17,6 +18,11 @@ const actions: ActionTree<AuthState, RootState> = {
 
     if (user && user.email) {
       const person = await PersonRepo.fetchByGmail(user.email);
+      
+      if (person && person.avatarFileId) {
+        person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+      }
+
       commit(FETCH_ME, person);
     } else {
       commit(SIGN_OUT);

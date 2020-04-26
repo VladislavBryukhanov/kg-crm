@@ -1,5 +1,9 @@
 <template>
   <v-container>
+    <v-overlay :value="loading">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
     <v-layout justify-center>
       <person-card 
         maxWidth="320"
@@ -112,13 +116,14 @@
 <script lang="ts">
   import { Vue, Component, Watch } from 'vue-property-decorator';
   import { mapActions, mapState } from 'vuex';
+  import { Route } from 'vue-router';
+  import isEqual from 'lodash.isequal';
   import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON } from '@/store/action-types';
   import PersonCard from '@/components/PersonCard.vue';
   import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
   import { Person, positionOptions, departmentOptions } from '@/models/person';
-  import { RootState } from '../models/store';
-  import isEqual from 'lodash.isequal';
-  import { Route } from 'vue-router';
+  import { RootState } from '@/models/store';
+  import { CreatePerson, UpdatePerson } from '@/models/store/person/actions-payload';
 
   @Component({ 
     components: { VuetifyDatePicker, PersonCard },
@@ -132,14 +137,9 @@
     }),
   })
   export default class PersonConstructor extends Vue {
-    private createPerson!: (person: Person) => Promise<void>;
     private fetchPerson!: (personId: string) => Promise<void>;
-    private updatePerson!: (
-      payload: { 
-        personId: string,
-        updates: Partial<Person>
-      }
-    ) => Promise<void>;
+    private createPerson!: (payload: CreatePerson) => Promise<void>;
+    private updatePerson!: (payload: UpdatePerson) => Promise<void>;
 
     persons!: Person[];
 
@@ -184,8 +184,12 @@
       ],
     };
 
+    loading = false;
+
+    personAvatar?: File;
+
     originalPerson?: Person;
-    person: Partial<Person> = { avatarUrl: '' };
+    person: Partial<Person> = { avatarUrl: '' }; // avatarUrl init value needed for reactivity
 
     get isDataValid() {
       const isFormValid =this.valid && this.person.hiredAt;
@@ -219,7 +223,7 @@
         return this.initPerson(personId, this.persons);
       }
 
-      this.person = { avatarUrl: '' };
+      this.person = { avatarUrl: '' }; // avatarUrl init value needed for reactivity
       this.originalPerson = undefined;
     }
 
@@ -235,14 +239,17 @@
       this.originalPerson = persons.find(({ id }) => id === personId);
 
       if (this.originalPerson) {
-        this.person = { ...this.originalPerson };
+        const { avatarUrl = '' } = this.originalPerson;
+        this.person = { ...this.originalPerson, avatarUrl };
       }
     }
 
     onAvatarChanged(file: File) {
       if (!file) return;
 
+      this.personAvatar = file;
       const reader = new FileReader();
+
       reader.readAsDataURL(file);
       reader.onload = () => {
         this.person.avatarUrl = reader.result as string;
@@ -250,17 +257,26 @@
     }
 
     async onSave() {
-      // TODO implement avatar uploading
+      this.loading = true;
+
       const newPerson = { ...this.person } as Person;
-      delete newPerson.avatarUrl;
       delete newPerson.id;
+      delete newPerson.avatarUrl;
 
       if (this.isEditMode) {
-        await this.updatePerson({ personId: this.person.id!, updates: newPerson });
+        await this.updatePerson({ 
+          personId: this.person.id!,
+          updates: newPerson,
+          avatar: this.personAvatar,
+        });
       } else {
-        await this.createPerson(newPerson);
+        await this.createPerson({ 
+          person: newPerson,
+          avatar: this.personAvatar,
+        });
       }
-
+      
+      this.loading = false;
       this.$router.go(-1);
     }
   }

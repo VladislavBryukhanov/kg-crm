@@ -13,7 +13,7 @@
         @click="goToEditProfile"
       >
         <v-list-item-avatar>
-          <v-img :src="avatar"></v-img>
+          <v-img :src="profile.avatarUrl | personAvatarUrl"></v-img>
         </v-list-item-avatar>
 
         <v-list-item-title class="subtitle-1">
@@ -60,7 +60,7 @@
   import * as workerImg from '@/assets/worker.png';
   import { Person } from '@/models/person';
   import { RootState } from '@/models/store';
-import { Route } from 'vue-router';
+  import { Route } from 'vue-router';
 
   @Component({ 
     methods: mapActions({
@@ -104,10 +104,6 @@ import { Route } from 'vue-router';
 
     activeRoute!: number;
 
-    get avatar() {
-      return this.profile && this.profile.avatarUrl || workerImg;
-    }
-    
     created() {
       this.activeRoute = this.items.findIndex(({ pathName }) => pathName === this.$router.currentRoute.name)
     }

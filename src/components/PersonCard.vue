@@ -1,7 +1,11 @@
 <template>
   <v-card :max-width="maxWidth">
+    <v-overlay :value="loading" :absolute="true">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
     <v-img
-      :src="avatar"
+      :src="profile.avatarUrl | personAvatarUrl"
       class="align-end"
       max-height="240"
       contain
@@ -16,20 +20,9 @@
         absolute top right
       >
         <template v-slot:activator>
-          <v-btn 
-            v-if="!loading"
-            v-model="fabMode"
-            color="primary" dark fab
-          >
+          <v-btn v-model="fabMode" color="primary" dark fab>
             <v-icon v-if="fabMode">close</v-icon>
             <v-icon v-else>build</v-icon>
-          </v-btn>
-          <v-btn v-else dark fab @click.stop="" color="#1a567b9e">
-             <v-progress-circular
-              :width="3"
-              color="white"
-              indeterminate
-            ></v-progress-circular>
           </v-btn>
         </template>
         <v-btn fab dark color="red darken-2" @click="onDeletePerson">
@@ -101,10 +94,6 @@
 
     @Prop(Boolean)
     isReadonly?: boolean;
-
-    get avatar() {
-      return this.person.avatarUrl || workerImg;
-    }
 
     departmentOptions = departmentOptions;
     positionOptions = positionOptions;

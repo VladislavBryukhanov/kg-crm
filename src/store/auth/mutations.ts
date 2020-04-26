@@ -1,7 +1,7 @@
 import { FETCH_ME, SIGN_OUT } from '../mutation-types';
 import { MutationTree } from 'vuex';
 import { Person } from '@/models/person';
-import { AuthState, AuthMode } from '@/models/store/auth-state';
+import { AuthState, AuthMode } from '@/models/store/auth/auth-state';
 
 const mutations: MutationTree<AuthState> = {
   [FETCH_ME](state: AuthState, person: Person)   {
