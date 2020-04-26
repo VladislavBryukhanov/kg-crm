@@ -192,7 +192,7 @@
     person: Partial<Person> = { avatarUrl: '' }; // avatarUrl init value needed for reactivity
 
     get isDataValid() {
-      const isFormValid =this.valid && this.person.hiredAt;
+      const isFormValid = this.valid && this.person.hiredAt;
       const isAnyUpdates = this.originalPerson && !isEqual(this.person, this.originalPerson);
 
       return isFormValid && (!this.isEditMode || isAnyUpdates);
@@ -238,10 +238,15 @@
     private initPerson(personId: string, persons: Person[]) {
       this.originalPerson = persons.find(({ id }) => id === personId);
 
-      if (this.originalPerson) {
-        const { avatarUrl = '' } = this.originalPerson;
-        this.person = { ...this.originalPerson, avatarUrl };
+      if (!this.originalPerson) return;
+      
+      const { avatarUrl } = this.originalPerson;
+      
+      if (!avatarUrl) {
+        this.originalPerson.avatarUrl = '';
       }
+
+      this.person = { ...this.originalPerson };
     }
 
     onAvatarChanged(file: File) {

@@ -5,7 +5,7 @@
     </v-overlay>
 
     <v-img
-      :src="profile.avatarUrl | personAvatarUrl"
+      :src="person.avatarUrl | personAvatarUrl"
       class="align-end"
       max-height="240"
       contain
