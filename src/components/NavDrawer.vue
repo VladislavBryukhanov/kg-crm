@@ -10,7 +10,6 @@
       <v-list-item 
         class="px-2"
         link
-        v-if="profile"
         @click="goToEditProfile"
       >
         <v-list-item-avatar>
@@ -28,20 +27,22 @@
 
       <v-divider></v-divider>
 
-      <v-list-item
-        link
-        v-for="item in items"
-        :key="item.title"
-        @click.stop="item.action"
-      >
-        <v-list-item-icon>
-          <v-icon size="30">{{ item.icon }}</v-icon>
-        </v-list-item-icon>
+      <v-list-item-group :value="activeRoute">
+        <v-list-item
+          link
+          v-for="item in items"
+          :key="item.title"
+          @click.stop="item.action"
+        >
+          <v-list-item-icon>
+            <v-icon size="30">{{ item.icon }}</v-icon>
+          </v-list-item-icon>
 
-        <v-list-item-content>
-          <v-list-item-title class="body-2">{{ item.title }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="body-2">{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
     </v-navigation-drawer>
 
     <v-content>
@@ -53,12 +54,13 @@
 </template>
 
 <script lang="ts">
-  import { Vue, Component } from 'vue-property-decorator';
+  import { Vue, Component, Watch } from 'vue-property-decorator';
   import { SIGN_OUT } from '@/store/action-types';
   import { mapActions, mapState } from 'vuex';
   import * as workerImg from '@/assets/worker.png';
   import { Person } from '@/models/person';
   import { RootState } from '@/models/store';
+import { Route } from 'vue-router';
 
   @Component({ 
     methods: mapActions({
@@ -78,16 +80,19 @@
       { 
         title: 'Person list',
         icon: 'supervised_user_circle',
+        pathName: 'Persons',
         action: () => this.navigateTo('/persons'),
       },
       {
         title: 'Create person',
         icon: 'person_add',
+        pathName: 'CreatePerson',
         action: () => this.navigateTo('/new-person'),
       },
       { 
         title: 'Vacation',
         icon: 'today',
+        pathName: '',
         action: () => this.navigateTo('/'),
       },
       { 
@@ -97,8 +102,19 @@
       }
     ];
 
+    activeRoute!: number;
+
     get avatar() {
       return this.profile && this.profile.avatarUrl || workerImg;
+    }
+    
+    created() {
+      this.activeRoute = this.items.findIndex(({ pathName }) => pathName === this.$router.currentRoute.name)
+    }
+
+    @Watch('$route')
+    private onRouteChange(to: Route, from: Route) {
+      this.activeRoute = this.items.findIndex(({ pathName }) => pathName === to.name);
     }
 
     goToEditProfile() {

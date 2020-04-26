@@ -118,6 +118,7 @@
   import { Person, positionOptions, departmentOptions } from '@/models/person';
   import { RootState } from '../models/store';
   import isEqual from 'lodash.isequal';
+  import { Route } from 'vue-router';
 
   @Component({ 
     components: { VuetifyDatePicker, PersonCard },
@@ -131,9 +132,9 @@
     }),
   })
   export default class PersonConstructor extends Vue {
-    createPerson!: (person: Person) => Promise<void>;
-    fetchPerson!: (personId: string) => Promise<void>;
-    updatePerson!: (
+    private createPerson!: (person: Person) => Promise<void>;
+    private fetchPerson!: (personId: string) => Promise<void>;
+    private updatePerson!: (
       payload: { 
         personId: string,
         updates: Partial<Person>
@@ -184,10 +185,7 @@
     };
 
     originalPerson?: Person;
-
-    person: Partial<Person> = {
-      avatarUrl: ''
-    };
+    person: Partial<Person> = { avatarUrl: '' };
 
     get isDataValid() {
       const isFormValid =this.valid && this.person.hiredAt;
@@ -196,28 +194,48 @@
       return isFormValid && (!this.isEditMode || isAnyUpdates);
     }
 
-    get isEditMode() {
+    private get isEditMode() {
       return !!this.$router.currentRoute.params.personId;
     }
 
     @Watch('persons', { immediate: true, deep: true })
-    onPersonsChanged(persons: Person[], updatedPersons: Person[]) {
+    private onPersonsChanged(persons: Person[]) {
       const { personId } = this.$router.currentRoute.params;
 
-      if (!personId || !persons.length) return;
+      if (!personId || !this.persons.length) return;
 
-      this.originalPerson = persons.find(({ id }) => id === personId);
-
-      if (this.originalPerson) {
-        this.person = { ...this.originalPerson };
-      }
+      this.initPerson(personId, this.persons);
     }
 
-    created() {
+    @Watch('$route')
+    private onRouteChange(to: Route, from: Route) {
+      const { personId } = to.params;
+
+      if (personId) {
+        if (!this.persons) {
+          return this.fetchPerson(personId);  
+        }
+
+        return this.initPerson(personId, this.persons);
+      }
+
+      this.person = { avatarUrl: '' };
+      this.originalPerson = undefined;
+    }
+
+    private created() {
       const { personId } = this.$router.currentRoute.params;
 
       if (personId && !this.persons.find(({ id }) => id === personId)) {
         this.fetchPerson(personId);
+      }
+    }
+
+    private initPerson(personId: string, persons: Person[]) {
+      this.originalPerson = persons.find(({ id }) => id === personId);
+
+      if (this.originalPerson) {
+        this.person = { ...this.originalPerson };
       }
     }
 

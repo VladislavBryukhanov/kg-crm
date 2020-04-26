@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <router-view :key="$route.fullPath"/>
+      <router-view/>
       <ConfirmDialog ref="confirmDialog"></ConfirmDialog>
     </v-app>
   </div>
