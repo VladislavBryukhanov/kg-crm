@@ -4,6 +4,13 @@
       <v-flex sm8 offset-sm2>
         <v-card elevation="6">
           <v-list>
+            <v-progress-linear
+              absolute
+              top
+              :active="isItemProcessing"
+              :indeterminate="isItemProcessing"
+              color="primary"
+            ></v-progress-linear>
             <v-text-field 
               solo
               light 
@@ -12,10 +19,20 @@
               append-icon="library_add"
               @click:append="onAddPosition"
               @keyup.enter="onAddPosition"
+              :disabled="isItemProcessing"
             >
             </v-text-field>
 
-            <v-container v-if="!positions.length">
+            <v-container v-if="isLoading && !positions.length">
+              <v-skeleton-loader
+                v-for="n in skeletonItems"
+                :key="n"
+                height="54"
+                type="list-item"
+              ></v-skeleton-loader>
+            </v-container>
+
+            <v-container v-else-if="!isLoading && !positions.length">
               <h3 class="display-1 font-weight-light primary--text">
                 No positions found
               </h3>
@@ -34,8 +51,6 @@
                   <v-icon color="red darken-2">close</v-icon>
                 </v-btn>
               </v-list-item-action>
-              
-              <!-- <v-divider></v-divider> -->
             </v-list-item>
           </v-list>
         </v-card>
@@ -67,10 +82,15 @@
     createPosition!: (position: DynamicOption) => Promise<void>;
     deletePosition!: (positionId: string) => Promise<void>;
 
+    readonly skeletonItems = 4;
+    isLoading = true;
+
+    isItemProcessing = false;
     newPosition = '';
 
     created() {
-      this.listPositions();
+      this.listPositions()
+        .then(res => this.isLoading = false);
     }
 
     // TODO implement edit mode
@@ -82,8 +102,12 @@
         `Are you sure you want to create ${this.newPosition} position`
       );
 
-      await this.createPosition({ label: this.newPosition });
-      this.newPosition = '';
+      if (confirm) {
+        this.isItemProcessing = true;
+        await this.createPosition({ label: this.newPosition });
+        this.newPosition = '';
+        this.isItemProcessing = false;
+      }
     }
 
     async onRemovePosition(position: DynamicOption) {
@@ -93,7 +117,9 @@
       );
 
       if (confirm) {
-        this.deletePosition(position.id!);
+        this.isItemProcessing = true;
+        await this.deletePosition(position.id!);
+        this.isItemProcessing = false;
       }
     }
   }

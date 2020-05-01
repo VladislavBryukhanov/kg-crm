@@ -1,7 +1,22 @@
 <template>
   <v-container>
-    <v-row v-if="persons">
+    <v-row>
+      <template v-if="isLoading">
+        <v-col
+          v-for="n in skeletonItems"
+          :key="n"
+          :cols="6"
+        >
+          <v-skeleton-loader
+            class="mx-auto"
+            max-width="300"
+            type="card"
+          ></v-skeleton-loader>
+        </v-col>
+      </template>
+
       <v-col
+        v-else
          v-for="person in persons" 
         :key="person.id"
         :cols="6"
@@ -32,8 +47,12 @@
   export default class NavDrawer extends Vue {
     listPersons!: () => Promise<void>;
     
+    readonly skeletonItems = 4;
+    isLoading = true;
+
     created() {
-      this.listPersons();
+      this.listPersons()
+        .then(res => this.isLoading = false);
     }
   }
 </script>
