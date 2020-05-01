@@ -1,5 +1,4 @@
-import { FETCH_PERSON_BY_ID } from './../mutation-types';
-import { LIST_PERSONS, CREATE_PERSON, DELETE_PERSON, UPDATE_PERSON } from '../mutation-types';
+import { LIST_PERSONS, CREATE_PERSON, DELETE_PERSON, UPDATE_PERSON, FETCH_PERSON_BY_ID } from '../action-types';
 import { MutationTree } from 'vuex';
 import { Person } from '@/models/person';
 import { PersonState } from '@/models/store';

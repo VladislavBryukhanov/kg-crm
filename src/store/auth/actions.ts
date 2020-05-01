@@ -3,8 +3,7 @@ import { ActionTree } from 'vuex';
 import firebase from 'firebase';
 import { AuthState, RootState } from '@/models/store';
 import { SIGN_IN, SIGN_OUT, CHECK_AUTH } from '../action-types';
-import { FETCH_ME } from '../mutation-types';
-import { PersonRepo } from '@/api/person.repo';
+import PersonRepo from '@/api/person.repo';
 
 const actions: ActionTree<AuthState, RootState> = {
   async [CHECK_AUTH]({ commit }) {
@@ -23,7 +22,7 @@ const actions: ActionTree<AuthState, RootState> = {
         person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
       }
 
-      commit(FETCH_ME, person);
+      commit(CHECK_AUTH, person);
     } else {
       commit(SIGN_OUT);
     }

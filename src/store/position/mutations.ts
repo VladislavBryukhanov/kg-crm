@@ -1,4 +1,4 @@
-import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/mutation-types';
+import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/action-types';
 import { DynamicOption } from '@/models/dynamic-option';
 import { PositionState } from '@/models/store';
 import { MutationTree } from 'vuex';
