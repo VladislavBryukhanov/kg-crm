@@ -48,7 +48,7 @@
 
               <v-list-item-action>
                 <v-btn icon @click="onRemovePosition(position)">
-                  <v-icon color="red darken-2">close</v-icon>
+                  <v-icon color="red darken-2">delete_forever</v-icon>
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
@@ -61,26 +61,32 @@
 
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
-  import { mapState, mapActions } from 'vuex';
-  import { RootState } from '@/models/store';
+  import { mapState, mapActions, mapMutations } from 'vuex';
+  import { RootState, SnackBar } from '@/models/store';
   import { DynamicOption } from '@/models/dynamic-option';
-  import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/action-types';
+  import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION, SHOW_SNACKBAR } from '@/store/action-types';
 
   @Component({
     computed: mapState<RootState>({
       positions: (state: RootState) => state.PositionModule.positions
     }),
-    methods: mapActions({
-      listPositions: LIST_POSITIONS,
-      createPosition: CREATE_POSITION,
-      deletePosition: DELETE_POSITION,
-    })
+    methods: {
+      ...mapActions({
+        listPositions: LIST_POSITIONS,
+        createPosition: CREATE_POSITION,
+        deletePosition: DELETE_POSITION,
+      }),
+      ...mapMutations({
+        showSnackbar: SHOW_SNACKBAR
+      })
+    }
   })
   export default class ManagePosition extends Vue {
     positions!: DynamicOption[];
     listPositions!: () => Promise<void>;
     createPosition!: (position: DynamicOption) => Promise<void>;
     deletePosition!: (positionId: string) => Promise<void>;
+    showSnackbar!: (snackbar: SnackBar) => void;
 
     readonly skeletonItems = 4;
     isLoading = true;
@@ -94,9 +100,21 @@
     }
 
     // TODO implement edit mode
+    // TODO check unique
+
+    validatePosition(positionName: string) {
+      if (positionName.length >= 2 && positionName.length <= 48) {
+        return true;
+      }
+      this.showSnackbar({
+        message: 'Position name must be longer then 1 and less then 32 characters!',
+        duration: 5000
+      });
+    }
 
     async onAddPosition() {
-      // TODO validate
+      if (!this.validatePosition(this.newPosition)) return;
+
       const confirm = await this.$root.$data.$confirmDialog(
         'Confirm creating',
         `Are you sure you want to create ${this.newPosition} position`

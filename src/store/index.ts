@@ -4,6 +4,7 @@ import { RootState } from '@/models/store/root-state';
 import { AuthModule } from './auth';
 import { PersonModule } from './person';
 import { PositionModule } from './position';
+import { UiUtilsModule } from './ui-utils';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ const store: StoreOptions<RootState> = {
     AuthModule,
     PersonModule,
     PositionModule,
+    UiUtilsModule,
   }
 };
 

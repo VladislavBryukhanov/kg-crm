@@ -1,3 +1,7 @@
+// Ui Utils Module
+export const SHOW_SNACKBAR = 'show_snackbar';
+export const HIDE_SNACKBAR = 'hide_snackbar';
+
 // Auth Module
 export const CHECK_AUTH = 'check_auth';
 export const SIGN_IN = 'sign_in';
