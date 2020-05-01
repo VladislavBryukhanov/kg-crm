@@ -4,8 +4,9 @@ const db = firebase.firestore();
 
 const POSITION_COLLECTION = 'position';
 
+// TODO make more abstract
 export class PositionRepo {
-  private static snapshotToPerson(snapshot: firebase.firestore.DocumentData): DynamicOption {
+  private static snapshotToPosition(snapshot: firebase.firestore.DocumentData): DynamicOption {
     return { id: snapshot.id, ...snapshot.data() };
   }
 
@@ -15,7 +16,7 @@ export class PositionRepo {
         .then((querySnapshot) => {
           const personList: DynamicOption[] = [];
           querySnapshot.forEach(snapshot =>
-            personList.push(this.snapshotToPerson(snapshot))
+            personList.push(this.snapshotToPosition(snapshot))
           );
 
           resolve(personList);
@@ -24,4 +25,18 @@ export class PositionRepo {
     });
   }
 
+  static async create(position: DynamicOption): Promise<DynamicOption> {
+    const positionSnapshot = await db.collection(POSITION_COLLECTION).add(position)
+      .then(snapshot => snapshot.get());
+
+    return this.snapshotToPosition(positionSnapshot);
+  }
+
+  static async update(positionId: string, updates: Partial<DynamicOption>): Promise<void> {
+    return db.collection(POSITION_COLLECTION).doc(positionId).update(updates);
+  }
+
+  static async delete(positionId: string) {
+    return db.collection(POSITION_COLLECTION).doc(positionId).delete();
+  }
 }

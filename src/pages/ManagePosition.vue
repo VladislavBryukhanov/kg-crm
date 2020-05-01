@@ -7,14 +7,16 @@
             <v-text-field 
               solo
               light 
+              v-model="newPosition"
               placeholder="Add new position"
               append-icon="library_add"
               @click:append="onAddPosition"
+              @keyup.enter="onAddPosition"
             >
             </v-text-field>
 
-            <v-container>
-              <h3 class="display-1 font-weight-light primary--text" v-if="!positions.length">
+            <v-container v-if="!positions.length">
+              <h3 class="display-1 font-weight-light primary--text">
                 No positions found
               </h3>
             </v-container>
@@ -47,26 +49,41 @@
   import { mapState, mapActions } from 'vuex';
   import { RootState } from '@/models/store';
   import { DynamicOption } from '@/models/dynamic-option';
-  import { LIST_POSITIONS } from '@/store/action-types';
+  import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/action-types';
 
   @Component({
     computed: mapState<RootState>({
       positions: (state: RootState) => state.PositionModule.positions
     }),
     methods: mapActions({
-      listPositions: LIST_POSITIONS
+      listPositions: LIST_POSITIONS,
+      createPosition: CREATE_POSITION,
+      deletePosition: DELETE_POSITION,
     })
   })
   export default class ManagePosition extends Vue {
     positions!: DynamicOption[];
     listPositions!: () => Promise<void>;
+    createPosition!: (position: DynamicOption) => Promise<void>;
+    deletePosition!: (positionId: string) => Promise<void>;
+
+    newPosition = '';
 
     created() {
       this.listPositions();
     }
 
-    onAddPosition() {
+    // TODO implement edit mode
 
+    async onAddPosition() {
+      // TODO validate
+      const confirm = await this.$root.$data.$confirmDialog(
+        'Confirm creating',
+        `Are you sure you want to create ${this.newPosition} position`
+      );
+
+      await this.createPosition({ label: this.newPosition });
+      this.newPosition = '';
     }
 
     async onRemovePosition(position: DynamicOption) {
@@ -74,6 +91,10 @@
         'Confirm position removing',
         `Are you sure you want to remove ${position.label} from the list of positions`
       );
+
+      if (confirm) {
+        this.deletePosition(position.id!);
+      }
     }
   }
 </script>

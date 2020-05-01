@@ -12,3 +12,5 @@ export const DELETE_PERSON = 'delete_person';
 
 // Position Module
 export const LIST_POSITIONS = 'list_positions';
+export const CREATE_POSITION = 'create_position';
+export const DELETE_POSITION = 'delete_position';
