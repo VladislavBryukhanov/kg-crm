@@ -31,6 +31,11 @@ const routes: Array<RouteConfig> = [
         path: '/edit-person/:personId',
         name: 'EditPerson',
         component: () => import('@/pages/PersonConstructor.vue'),
+      },
+      {
+        path: '/manage-position',
+        name: 'ManagePosition',
+        component: () => import('@/pages/ManagePosition.vue'),
       }
     ]
   }

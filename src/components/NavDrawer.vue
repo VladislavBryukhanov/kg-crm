@@ -89,6 +89,12 @@
         pathName: 'CreatePerson',
         action: () => this.navigateTo('/new-person'),
       },
+      {
+        title: 'Manage positions',
+        icon: 'business_center',
+        pathName: 'ManagePosition',
+        action: () => this.navigateTo('/manage-position')
+      },
       { 
         title: 'Vacation',
         icon: 'today',

@@ -9,3 +9,6 @@ export const LIST_PERSONS = 'list_persons';
 export const CREATE_PERSON = 'create_person';
 export const UPDATE_PERSON = 'update_person';
 export const DELETE_PERSON = 'delete_person';
+
+// Position Module
+export const LIST_POSITIONS = 'list_positions';
