@@ -4,8 +4,8 @@ const db = firebase.firestore();
 export interface CRUD<T> {
   list(): Promise<T[]>;
   create(item: T): Promise<T>;
-  update(positionId: string, updates: Partial<T>): Promise<void>,
-  delete(positionId: string): Promise<void>,
+  update(itemId: string, updates: Partial<T>): Promise<void>,
+  delete(itemId: string): Promise<void>,
 }
 
 export class BaseRepo<T> implements CRUD<T>{
@@ -15,8 +15,13 @@ export class BaseRepo<T> implements CRUD<T>{
     this.collectionRef = db.collection(collection);
   }
 
-  snapshotToModel(snapshot: firebase.firestore.DocumentData): T {
+  snapshotToModel<K = T>(snapshot: firebase.firestore.DocumentData): K {
     return { id: snapshot.id, ...snapshot.data() };
+  }
+
+  async fetchById(id: string): Promise<T | undefined> {
+    const snapshot = await this.collectionRef.doc(id).get();
+    return this.snapshotToModel(snapshot);
   }
 
   async list(): Promise<T[]> {
@@ -34,18 +39,18 @@ export class BaseRepo<T> implements CRUD<T>{
     });
   }
 
-  async create(position: T): Promise<T> {
-    const positionSnapshot = await this.collectionRef.add(position)
+  async create(item: T): Promise<T> {
+    const itemSnapshot = await this.collectionRef.add(item)
       .then(snapshot => snapshot.get());
 
-    return this.snapshotToModel(positionSnapshot);
+    return this.snapshotToModel(itemSnapshot);
   }
 
-  async update(positionId: string, updates: Partial<T>): Promise<void> {
-    return this.collectionRef.doc(positionId).update(updates);
+  async update(itemId: string, updates: Partial<T>): Promise<void> {
+    return this.collectionRef.doc(itemId).update(updates);
   }
 
-  async delete(positionId: string): Promise<void> {
-    return this.collectionRef.doc(positionId).delete();
+  async delete(itemId: string): Promise<void> {
+    return this.collectionRef.doc(itemId).delete();
   }
 }

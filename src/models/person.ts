@@ -1,10 +1,14 @@
+import firebase from 'firebase';
+import { DynamicOption } from '@/models/dynamic-option';
+
 export interface Person extends PersonPrivateInfo {
   id?: string;
   fullName: string;
   avatarUrl?: string;
   avatarFileId?: string;
   hiredAt: string;
-  position: Position;
+  positionRef: firebase.firestore.DocumentReference;
+  position: DynamicOption;
   department: Department;
   attachedTo?: string; //TODO Link to person
   corporateMail?: string;
@@ -29,66 +33,10 @@ export interface Option {
   label: string;
 }
 
-export enum Position {
-  JUNIOR_DEVELOPER = 'junior_dev',
-  MIDDLE_DEVELOPER = 'middle_dev',
-  SENIOR_DEVELOPER = 'senior_dev',
-  TEAM_LEAD = 'team_lead',
-  BUSINESS_ANALYTIC = 'business_analytic',
-  OFFICE_MANAGER = 'office_manager',
-  SALES_MANAGER = 'sales_manager',
-  PROJECT_MANAGER = 'project_manager',
-  HUMAN_RESOURCES = 'human_resources_manager',
-  CO_FOUNDER = 'co_founder',
-}
-
 export enum Department {
   JAVASCRIPT = 'JS',
   PHP = 'PHP',
 }
-
-export const positionOptions: Option[] = [
-  {
-    value: Position.JUNIOR_DEVELOPER,
-    label: 'Junior developer',
-  },
-  {
-    value: Position.MIDDLE_DEVELOPER,
-    label: 'Middle developer',
-  },
-  {
-    value: Position.SENIOR_DEVELOPER,
-    label: 'Senior developer',
-  },
-  {
-    value: Position.TEAM_LEAD,
-    label: 'Team lead',
-  },
-  {
-    value: Position.BUSINESS_ANALYTIC,
-    label: 'Business analitic',
-  },
-  {
-    value: Position.OFFICE_MANAGER,
-    label: 'Office manager',
-  },
-  {
-    value: Position.SALES_MANAGER,
-    label: 'Sales manager',
-  },
-  {
-    value: Position.PROJECT_MANAGER,
-    label: 'Project manager',
-  },
-  {
-    value: Position.HUMAN_RESOURCES,
-    label: 'Human resources manager',
-  },
-  {
-    value: Position.CO_FOUNDER,
-    label: 'Co-Founder',
-  },
-];
 
 export const departmentOptions: Option[] = [
   {

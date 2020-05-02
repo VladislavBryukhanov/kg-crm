@@ -81,7 +81,7 @@
             label="Position *"
             prepend-icon="business_center"
             item-text="label"
-            item-value="value"
+            return-object
             :items="positionOptions"
             :rules="rules.position"
             v-model="person.position"
@@ -118,33 +118,37 @@
   import { mapActions, mapState } from 'vuex';
   import { Route } from 'vue-router';
   import isEqual from 'lodash.isequal';
-  import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON } from '@/store/action-types';
+  import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON, LIST_POSITIONS } from '@/store/action-types';
   import PersonCard from '@/components/PersonCard.vue';
   import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
-  import { Person, positionOptions, departmentOptions } from '@/models/person';
+  import { Person, departmentOptions } from '@/models/person';
   import { RootState } from '@/models/store';
   import { CreatePerson, UpdatePerson } from '@/models/store/person/actions-payload';
+  import { DynamicOption } from '../models/dynamic-option';
 
-  @Component({ 
+  @Component({
     components: { VuetifyDatePicker, PersonCard },
      computed: mapState<RootState>({
-      persons: (state: RootState) => state.PersonModule.persons
+      persons: (state: RootState) => state.PersonModule.persons,
+      positionOptions: (state: RootState) => state.PositionModule.positions,
     }),
     methods: mapActions({ 
       createPerson: CREATE_PERSON,
       fetchPerson: FETCH_PERSON_BY_ID,
       updatePerson: UPDATE_PERSON,
+      listPositions: LIST_POSITIONS,
     }),
   })
   export default class PersonConstructor extends Vue {
     private fetchPerson!: (personId: string) => Promise<void>;
     private createPerson!: (payload: CreatePerson) => Promise<void>;
     private updatePerson!: (payload: UpdatePerson) => Promise<void>;
+    private listPositions!: () => Promise<void>;
 
     persons!: Person[];
+    positionOptions!: DynamicOption[];
 
     departmentOptions = departmentOptions;
-    positionOptions = positionOptions;
 
     valid = false;
 
@@ -232,6 +236,10 @@
 
       if (personId && !this.persons.find(({ id }) => id === personId)) {
         this.fetchPerson(personId);
+      }
+
+      if (!this.positionOptions.length) {
+        this.listPositions();
       }
     }
 

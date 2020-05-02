@@ -63,6 +63,7 @@
   import { Vue, Component } from 'vue-property-decorator';
   import { mapState, mapActions, mapMutations } from 'vuex';
   import { RootState, SnackBar } from '@/models/store';
+  import { CreateEntity } from '@/models/common';
   import { DynamicOption } from '@/models/dynamic-option';
   import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION, SHOW_SNACKBAR } from '@/store/action-types';
 
@@ -84,7 +85,7 @@
   export default class ManagePosition extends Vue {
     positions!: DynamicOption[];
     listPositions!: () => Promise<void>;
-    createPosition!: (position: DynamicOption) => Promise<void>;
+    createPosition!: (position: CreateEntity<DynamicOption>) => Promise<void>;
     deletePosition!: (positionId: string) => Promise<void>;
     showSnackbar!: (snackbar: SnackBar) => void;
 

@@ -1,0 +1,1 @@
+export type CreateEntity<T> = Omit<T, 'id'>;

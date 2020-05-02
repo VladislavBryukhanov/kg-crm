@@ -1,4 +1,4 @@
 export interface DynamicOption {
-  id?: string;
+  id: string;
   label: string;
 }

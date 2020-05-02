@@ -44,7 +44,7 @@
           </v-list-item-content>
 
           <v-list-item-content class="text-right">
-            <v-list-item-title>{{positionLabel(person.position)}}</v-list-item-title>
+            <v-list-item-title>{{person.position.label}}</v-list-item-title>
             <v-list-item-subtitle>Position</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -74,17 +74,28 @@
 
 <script lang="ts">
   import { Vue, Component, Prop } from 'vue-property-decorator';
-  import { mapActions } from 'vuex';
-  import { Option, Person, Position, Department, positionOptions, departmentOptions } from '@/models/person';
+  import { mapActions, mapState } from 'vuex';
+  import { Option, Person, Department, departmentOptions } from '@/models/person';
+  import { RootState } from '@/models/store';
   import * as workerImg from '@/assets/worker.png';
-  import { DELETE_PERSON } from '@/store/action-types';
+  import { DELETE_PERSON, LIST_POSITIONS } from '@/store/action-types';
+  import { DynamicOption } from '../models/dynamic-option';
 
   @Component({ 
     name: 'person-card',
-    methods: mapActions({ deletePerson: DELETE_PERSON })
+    methods: mapActions({ 
+      deletePerson: DELETE_PERSON,
+      listPositions: LIST_POSITIONS,
+    }),
+    computed: mapState<RootState>({
+      positionOptions: (state: RootState) => state.PositionModule.positions,
+    }),
   })
   export default class PersonCard extends Vue {
-    deletePerson!: (personId: string) => Promise<void>;
+    private deletePerson!: (personId: string) => Promise<void>;
+    private listPositions!: () => Promise<void>;
+
+    positionOptions!: DynamicOption[];
 
     @Prop(Object)
     person!: Person;
@@ -96,15 +107,9 @@
     isReadonly?: boolean;
 
     departmentOptions = departmentOptions;
-    positionOptions = positionOptions;
 
     fabMode = false;
     loading = false;
-
-    positionLabel(position: Position): string{
-      const option = positionOptions.find(({ value }) => value === position);
-      return option ? option.label : '';
-    }
 
     departmentLabel(department: Department): string {
       const option = departmentOptions.find(({ value }) => value === department);
