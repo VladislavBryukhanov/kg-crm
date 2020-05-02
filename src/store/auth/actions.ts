@@ -7,7 +7,7 @@ import PersonRepo from '@/api/person.repo';
 import { errorHandler } from '@/utils/error-handler';
 
 const actions: ActionTree<AuthState, RootState> = {
-  async [CHECK_AUTH]({ commit }) {
+  async [CHECK_AUTH]({ commit, dispatch }) {
     try {
       // fetch persistent auth state one time and unsubscribe
       const user: firebase.User | null = await new Promise((resolve, reject) => {
@@ -17,18 +17,19 @@ const actions: ActionTree<AuthState, RootState> = {
         }, reject);
       });
 
-      if (user && user.email) {
-        const person = await PersonRepo.fetchByGmail(user.email);
-        
-        if (person && person.avatarFileId) {
-          person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
-        }
-
-        commit(CHECK_AUTH, person);
-      } else {
-        commit(SIGN_OUT);
+      if (!user || !user.email) {
+        return dispatch(SIGN_OUT);
       }
+
+      const person = await PersonRepo.fetchByGmail(user.email);
+
+      if (person.avatarFileId) {
+        person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+      }
+
+      commit(CHECK_AUTH, person);
     } catch (err) {
+      dispatch(SIGN_OUT);
       errorHandler(err, CHECK_AUTH, commit);
     }
   },

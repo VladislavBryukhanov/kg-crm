@@ -39,15 +39,21 @@ class PersonRepo extends BaseRepo<Person> {
     return super.update(personId, updates);
   }
 
-  async fetchByGmail(gmail: string): Promise<Person | undefined> {
+  async fetchByGmail(gmail: string): Promise<Person> {
     const person = await new Promise<Person>((resolve, reject) => {
       this.collectionRef
         .where('gmail', '==', gmail)
         .limit(1)
         .get()
-        .then(querySnapshot => querySnapshot.forEach(
-          snapshot => resolve(this.snapshotToModel(snapshot))
-        ))
+        .then(querySnapshot => {
+          if (querySnapshot.empty) {
+            reject(new Error("User with such gmail doesn't exists"))
+          }
+
+          querySnapshot.forEach(
+            snapshot => resolve(this.snapshotToModel(snapshot))
+          )
+        })
         .catch(reject);
     });
 

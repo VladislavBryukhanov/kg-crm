@@ -46,13 +46,19 @@
   })
   export default class NavDrawer extends Vue {
     listPersons!: () => Promise<void>;
+
+    persons!: Person[];
     
     readonly skeletonItems = 4;
     isLoading = true;
 
     created() {
-      this.listPersons()
-        .then(res => this.isLoading = false);
+      this.isLoading = !this.persons.length;
+
+      if (this.isLoading) {
+        this.listPersons()
+          .then(res => this.isLoading = false);
+      }
     }
   }
 </script>

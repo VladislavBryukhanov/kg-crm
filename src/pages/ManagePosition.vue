@@ -83,11 +83,12 @@
     }
   })
   export default class ManagePosition extends Vue {
-    positions!: DynamicOption[];
     listPositions!: () => Promise<void>;
     createPosition!: (position: CreateEntity<DynamicOption>) => Promise<void>;
     deletePosition!: (positionId: string) => Promise<void>;
     showSnackbar!: (snackbar: SnackBar) => void;
+
+    positions!: DynamicOption[];
 
     readonly skeletonItems = 4;
     isLoading = true;
@@ -96,8 +97,12 @@
     newPosition = '';
 
     created() {
-      this.listPositions()
-        .then(res => this.isLoading = false);
+      this.isLoading = !this.positions.length;
+
+      if (this.isLoading) {
+        this.listPositions()
+          .then(res => this.isLoading = false);
+      }
     }
 
     // TODO implement edit mode
