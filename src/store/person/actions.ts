@@ -4,56 +4,77 @@ import { LIST_PERSONS, CREATE_PERSON, DELETE_PERSON, FETCH_PERSON_BY_ID, UPDATE_
 import PersonRepo from '@/api/person.repo';
 import { FileRepo } from '@/api/file.repo';
 import { UpdatePerson, CreatePerson } from '@/models/store/person/actions-payload';
+import { errorHandler } from '@/utils/error-handler';
 
 const actions: ActionTree<PersonState, RootState> = {
   async [FETCH_PERSON_BY_ID]({ commit }, personId: string) {
-    const person = await PersonRepo.fetchById(personId);
+    try {
+      const person = await PersonRepo.fetchById(personId);
 
-    if (person && person.avatarFileId) {
-      person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+      if (person && person.avatarFileId) {
+        person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+      }
+
+      commit(FETCH_PERSON_BY_ID, person);
+    } catch (err) {
+      errorHandler(err, FETCH_PERSON_BY_ID, commit);
     }
-
-    commit(FETCH_PERSON_BY_ID, person);
   },
   async [LIST_PERSONS]({ commit }) {
-    let persons = await PersonRepo.list();
-    
-    persons = await Promise.all(
-      persons.map( async (person) => {
-        if (person.avatarFileId) {
-          person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
-        }
-        return person;
-      })
-    );
-        
-    commit(LIST_PERSONS, persons);
+    try{
+      let persons = await PersonRepo.list();
+      
+      persons = await Promise.all(
+        persons.map( async (person) => {
+          if (person.avatarFileId) {
+            person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+          }
+          return person;
+        })
+      );
+          
+      commit(LIST_PERSONS, persons);
+    } catch (err) {
+      errorHandler(err, LIST_PERSONS, commit);
+    }
   },
   async [CREATE_PERSON]({ commit }, { avatar, person }: CreatePerson) {
-    if (avatar) {
-      person.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
+    try {
+      if (avatar) {
+        person.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
+      }
+
+      const createdPerson = await PersonRepo.create(person);
+
+      commit(CREATE_PERSON, createdPerson);
+    } catch (err) {
+      errorHandler(err, CREATE_PERSON, commit);
     }
-
-    const createdPerson = await PersonRepo.create(person);
-
-    commit(CREATE_PERSON, createdPerson);
   },
   async [UPDATE_PERSON]({ commit }, { personId, updates, avatar }: UpdatePerson) {
-    if (avatar) {
-      updates.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
+    try {
+      if (avatar) {
+        updates.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
+      }
+
+      await PersonRepo.update(personId, updates);
+
+      if (updates.avatarFileId) {
+        updates.avatarUrl = await FileRepo.getPersonAvatarUrl(updates.avatarFileId);
+      }
+
+      commit(UPDATE_PERSON, { personId, updates });
+    } catch (err) {
+      errorHandler(err, UPDATE_PERSON, commit);
     }
-
-    await PersonRepo.update(personId, updates);
-
-    if (updates.avatarFileId) {
-      updates.avatarUrl = await FileRepo.getPersonAvatarUrl(updates.avatarFileId);
-    }
-
-    commit(UPDATE_PERSON, { personId, updates });
   },
   async [DELETE_PERSON]({ commit }, personId: string) {
-    await PersonRepo.delete(personId);
-    commit(DELETE_PERSON, personId);
+    try {
+      await PersonRepo.delete(personId);
+      commit(DELETE_PERSON, personId);
+    } catch (err) {
+      errorHandler(err, DELETE_PERSON, commit);
+    }
   }
 };
 

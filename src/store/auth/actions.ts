@@ -4,38 +4,51 @@ import firebase from 'firebase';
 import { AuthState, RootState } from '@/models/store';
 import { SIGN_IN, SIGN_OUT, CHECK_AUTH } from '../action-types';
 import PersonRepo from '@/api/person.repo';
+import { errorHandler } from '@/utils/error-handler';
 
 const actions: ActionTree<AuthState, RootState> = {
   async [CHECK_AUTH]({ commit }) {
-    // fetch persistent auth state one time and unsubscribe
-    const user: firebase.User | null = await new Promise((resolve, reject) => {
-      const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-        unsubscribe();
-        resolve(user);
-      }, reject);
-    });
+    try {
+      // fetch persistent auth state one time and unsubscribe
+      const user: firebase.User | null = await new Promise((resolve, reject) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve(user);
+        }, reject);
+      });
 
-    if (user && user.email) {
-      const person = await PersonRepo.fetchByGmail(user.email);
-      
-      if (person && person.avatarFileId) {
-        person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+      if (user && user.email) {
+        const person = await PersonRepo.fetchByGmail(user.email);
+        
+        if (person && person.avatarFileId) {
+          person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
+        }
+
+        commit(CHECK_AUTH, person);
+      } else {
+        commit(SIGN_OUT);
       }
-
-      commit(CHECK_AUTH, person);
-    } else {
-      commit(SIGN_OUT);
+    } catch (err) {
+      errorHandler(err, CHECK_AUTH, commit);
     }
   },
-  async [SIGN_IN]({ dispatch }) {
-    const authProvider = new firebase.auth.GoogleAuthProvider();
-    await firebase.auth().signInWithPopup(authProvider);
+  async [SIGN_IN]({ dispatch, commit }) {
+    try {
+      const authProvider = new firebase.auth.GoogleAuthProvider();
+      await firebase.auth().signInWithPopup(authProvider);
 
-    await dispatch(CHECK_AUTH);
+      await dispatch(CHECK_AUTH);
+    } catch (err) {
+      errorHandler(err, SIGN_IN, commit);
+    }
   },
   async [SIGN_OUT]({ commit }) {
-    await firebase.auth().signOut();
-    commit(SIGN_OUT);
+    try {
+      await firebase.auth().signOut();
+      commit(SIGN_OUT);
+    } catch (err) {
+      errorHandler(err, SIGN_OUT, commit);
+    }
   },
 };
 
