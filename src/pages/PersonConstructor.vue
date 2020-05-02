@@ -57,7 +57,7 @@
           <v-file-input
             label="Avatar"
             prepend-icon="camera_alt"
-            accept="image/ *"
+            accept="image/*"
             clerable
             :rules="rules.avatar"
             @change="onAvatarChanged"

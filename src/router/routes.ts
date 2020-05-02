@@ -35,7 +35,12 @@ const routes: Array<RouteConfig> = [
       {
         path: '/manage-position',
         name: 'ManagePosition',
-        component: () => import('@/pages/ManagePosition.vue'),
+        component: () => import('@/pages/PositionManager.vue'),
+      },
+      {
+        path: '/manage-department',
+        name: 'ManageDepartment',
+        component: () => import('@/pages/DepartmentManager.vue'),
       }
     ]
   }

@@ -90,6 +90,12 @@
         action: () => this.navigateTo('/new-person'),
       },
       {
+        title: 'Manage departments',
+        icon: 'apartment',
+        pathName: 'ManageDepartment',
+        action: () => this.navigateTo('/manage-department')
+      },
+      {
         title: 'Manage positions',
         icon: 'business_center',
         pathName: 'ManagePosition',

@@ -9,9 +9,11 @@
     "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
+    "@types/lodash.capitalize": "^4.2.6",
     "@types/lodash.isequal": "^4.5.5",
     "core-js": "^3.6.4",
     "firebase": "^7.13.2",
+    "lodash.capitalize": "^4.2.1",
     "lodash.isequal": "^4.5.0",
     "material-design-icons-iconfont": "^5.0.1",
     "moment-mini": "^2.24.0",
