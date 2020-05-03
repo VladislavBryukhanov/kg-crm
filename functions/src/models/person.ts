@@ -1,15 +1,15 @@
-import firebase from 'firebase';
-import { DynamicOption } from '@/models/dynamic-option';
+import { DynamicOption } from './dynamic-option';
+import { DocumentReference } from '@google-cloud/firestore';
 
 export interface Person extends PersonPrivateInfo {
-  id?: string;
+  id: string;
   fullName: string;
   avatarUrl?: string;
   avatarFileId?: string;
   hiredAt: string;
-  positionRef: firebase.firestore.DocumentReference;
+  positionRef: DocumentReference;
   position: DynamicOption;
-  departmentRef: firebase.firestore.DocumentReference;
+  departmentRef: DocumentReference;
   department: DynamicOption;
   attachedTo?: string; //TODO Link to person
   corporateMail?: string;

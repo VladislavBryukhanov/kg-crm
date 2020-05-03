@@ -6,6 +6,7 @@ export const HIDE_SNACKBAR = 'hide_snackbar';
 export const CHECK_AUTH = 'check_auth';
 export const SIGN_IN = 'sign_in';
 export const SIGN_OUT = 'sign_out';
+export const SCHEDULE_VACATION = 'schedule_vacation';
 
 // Person Module
 export const FETCH_PERSON_BY_ID = 'fetch_by_id';

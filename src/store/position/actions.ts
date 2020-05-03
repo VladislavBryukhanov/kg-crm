@@ -1,6 +1,6 @@
 import { DynamicOption } from '@/models/dynamic-option';
 import { ActionTree } from 'vuex';
-import PositionRepo from '@/api/position.repo';
+import PositionRepo from '@/api/repos/position.repo';
 import { PositionState, RootState } from '@/models/store';
 import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/action-types';
 import { errorHandler } from '@/utils/error-handler';

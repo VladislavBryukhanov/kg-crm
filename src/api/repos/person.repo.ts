@@ -1,6 +1,6 @@
-import { FileRepo } from '@/api/file.repo';
-import PositionRepo from '@/api/position.repo';
-import DepartmentRepo from '@/api/department.repo';
+import { FileRepo } from '@/api/repos/file.repo';
+import PositionRepo from '@/api/repos/position.repo';
+import DepartmentRepo from '@/api/repos/department.repo';
 import { DynamicOption } from '@/models/dynamic-option';
 import { Person } from '@/models/person';
 import { BaseRepo } from './base.repo';

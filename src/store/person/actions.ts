@@ -1,8 +1,8 @@
 import { ActionTree } from 'vuex';
 import { PersonState, RootState } from '@/models/store';
 import { LIST_PERSONS, CREATE_PERSON, DELETE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON } from '../action-types';
-import PersonRepo from '@/api/person.repo';
-import { FileRepo } from '@/api/file.repo';
+import PersonRepo from '@/api/repos/person.repo';
+import { FileRepo } from '@/api/repos/file.repo';
 import { UpdatePerson, CreatePerson } from '@/models/store/person/actions-payload';
 import { errorHandler } from '@/utils/error-handler';
 

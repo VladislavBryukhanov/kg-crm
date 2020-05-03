@@ -41,6 +41,11 @@ const routes: Array<RouteConfig> = [
         path: '/manage-department',
         name: 'ManageDepartment',
         component: () => import('@/pages/DepartmentManager.vue'),
+      },
+      {
+        path: '/vacation-manager',
+        name: 'VacationManager',
+        component: () => import('@/pages/VacationManager.vue'),
       }
     ]
   }

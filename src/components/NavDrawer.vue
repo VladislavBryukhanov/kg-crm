@@ -104,8 +104,8 @@
       { 
         title: 'Vacation',
         icon: 'today',
-        pathName: '',
-        action: () => this.navigateTo('/'),
+        pathName: 'VacationManager',
+        action: () => this.navigateTo('/vacation-manager'),
       },
       { 
         title: 'Sign out',

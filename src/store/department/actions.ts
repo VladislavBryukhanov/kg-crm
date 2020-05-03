@@ -1,6 +1,6 @@
 import { DynamicOption } from '@/models/dynamic-option';
 import { ActionTree } from 'vuex';
-import DepartmentRepo from '@/api/department.repo';
+import DepartmentRepo from '@/api/repos/department.repo';
 import { DepartmentState, RootState } from '@/models/store';
 import { LIST_DEPARTMENTS, CREATE_DEPARTMENT, DELETE_DEPARTMENT } from '@/store/action-types';
 import { errorHandler } from '@/utils/error-handler';

@@ -1,10 +1,12 @@
-import { FileRepo } from '@/api/file.repo';
+import { FileRepo } from '@/api/repos/file.repo';
 import { ActionTree } from 'vuex';
 import firebase from 'firebase';
 import { AuthState, RootState } from '@/models/store';
-import { SIGN_IN, SIGN_OUT, CHECK_AUTH } from '../action-types';
-import PersonRepo from '@/api/person.repo';
+import { SIGN_IN, SIGN_OUT, CHECK_AUTH, SCHEDULE_VACATION } from '../action-types';
+import PersonRepo from '@/api/repos/person.repo';
 import { errorHandler } from '@/utils/error-handler';
+import { ScheduleVacation } from '@/models/person';
+import MailerApi from '@/api/mailer.api';
 
 const actions: ActionTree<AuthState, RootState> = {
   async [CHECK_AUTH]({ commit, dispatch }) {
@@ -49,6 +51,14 @@ const actions: ActionTree<AuthState, RootState> = {
       commit(SIGN_OUT);
     } catch (err) {
       errorHandler(err, SIGN_OUT, commit);
+    }
+  },
+  async [SCHEDULE_VACATION]({ commit }, { startDate, endDate }: ScheduleVacation) {
+    try {
+      await MailerApi.sendVacationEmail(startDate, endDate);
+      commit(SCHEDULE_VACATION, { startDate, endDate });
+    } catch (err) {
+      errorHandler(err, SCHEDULE_VACATION, commit);
     }
   },
 };

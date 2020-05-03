@@ -17,7 +17,7 @@
         </p>
       </v-card-text>
       <v-card-actions>
-        <v-btn large color="primary" v-on:click="onSignIn">Sign in</v-btn>
+        <v-btn large color="primary" @click="onSignIn">Sign in</v-btn>
         <v-btn text large color="secondary">View docs</v-btn>
       </v-card-actions>
     </v-card>
