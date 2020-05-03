@@ -9,7 +9,8 @@ export interface Person extends PersonPrivateInfo {
   hiredAt: string;
   positionRef: firebase.firestore.DocumentReference;
   position: DynamicOption;
-  department: Department;
+  departmentRef: firebase.firestore.DocumentReference;
+  department: DynamicOption;
   attachedTo?: string; //TODO Link to person
   corporateMail?: string;
 
@@ -27,24 +28,3 @@ export interface PersonPrivateInfo {
   sickLeaveDays: number;
   unpaidDays: number;
 }
-
-export interface Option {
-  value: string;
-  label: string;
-}
-
-export enum Department {
-  JAVASCRIPT = 'JS',
-  PHP = 'PHP',
-}
-
-export const departmentOptions: Option[] = [
-  {
-    value: Department.JAVASCRIPT,
-    label: 'JavaScript',
-  },
-  {
-    value: Department.PHP,
-    label: 'PHP',
-  },
-];

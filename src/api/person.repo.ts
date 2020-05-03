@@ -1,4 +1,6 @@
+import { FileRepo } from '@/api/file.repo';
 import PositionRepo from '@/api/position.repo';
+import DepartmentRepo from '@/api/department.repo';
 import { DynamicOption } from '@/models/dynamic-option';
 import { Person } from '@/models/person';
 import { BaseRepo } from './base.repo';
@@ -10,30 +12,58 @@ class PersonRepo extends BaseRepo<Person> {
     super(PERSON_COLLECTION)
   }
 
-  private async populatePosition(person: Person): Promise<Person> {
-    const snapshot = await person.positionRef.get();
-    const position = super.snapshotToModel<DynamicOption>(snapshot);
+  private async populateData(person: Person): Promise<Person> {
+    const targetRequests: Promise<any>[] = [
+      person.positionRef.get(),
+      person.departmentRef.get(),
+    ];
 
-    return { ...person, position };
+    if (person.avatarFileId) {
+      targetRequests.push(
+        FileRepo.getPersonAvatarUrl(person.avatarFileId)
+      );
+    }
+
+    const [positionSnap, departmentSnap, avatarUrl] = await Promise.all(targetRequests);
+
+    const position = super.snapshotToModel<DynamicOption>(positionSnap);
+    const department = super.snapshotToModel<DynamicOption>(departmentSnap);
+
+    return { ...person, position, department, avatarUrl };
+  }
+
+  async fetchById(id: string): Promise<Person | undefined> {
+    const person = await super.fetchById(id);
+
+    if (!person) return;
+
+    return this.populateData(person);
   }
 
   async list(): Promise<Person[]> {
     const persons = await super.list();
-    return Promise.all(persons.map(this.populatePosition));
+    return Promise.all(persons.map(this.populateData));
   }
 
   async create(person: Person): Promise<Person>{
-    person.positionRef = await PositionRepo.getPositionRef(person.position.id);
+    person.positionRef = PositionRepo.getPositionRef(person.position.id);
+    person.departmentRef = DepartmentRepo.getDepartmentRef(person.department.id);
     delete person.position;
+    delete person.department;
 
     const createdPerson = await super.create(person)
-    return this.populatePosition(createdPerson);
+    return this.populateData(createdPerson);
   }
 
   async update(personId: string, updates: Partial<Person>): Promise<void> {
     if (updates.position) {
-      updates.positionRef = await PositionRepo.getPositionRef(updates.position.id);
+      updates.positionRef = PositionRepo.getPositionRef(updates.position.id);
       delete updates.position;
+    }
+
+    if (updates.department) {
+      updates.departmentRef = DepartmentRepo.getDepartmentRef(updates.department.id);
+      delete updates.department;
     }
     
     return super.update(personId, updates);
@@ -57,7 +87,7 @@ class PersonRepo extends BaseRepo<Person> {
         .catch(reject);
     });
 
-    return this.populatePosition(person);
+    return this.populateData(person);
   }
 }
 

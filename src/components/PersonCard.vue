@@ -39,12 +39,12 @@
       <v-list two-line>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title>{{departmentLabel(person.department)}}</v-list-item-title>
+            <v-list-item-title>{{person.department && person.department.label}}</v-list-item-title>
             <v-list-item-subtitle>Department</v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-content class="text-right">
-            <v-list-item-title>{{person.position.label}}</v-list-item-title>
+            <v-list-item-title>{{person.position && person.position.label}}</v-list-item-title>
             <v-list-item-subtitle>Position</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -74,28 +74,22 @@
 
 <script lang="ts">
   import { Vue, Component, Prop } from 'vue-property-decorator';
-  import { mapActions, mapState } from 'vuex';
-  import { Option, Person, Department, departmentOptions } from '@/models/person';
+  import { mapActions } from 'vuex';
+  import { Person } from '@/models/person';
   import { RootState } from '@/models/store';
   import * as workerImg from '@/assets/worker.png';
   import { DELETE_PERSON, LIST_POSITIONS } from '@/store/action-types';
-  import { DynamicOption } from '../models/dynamic-option';
 
   @Component({ 
     name: 'person-card',
     methods: mapActions({ 
       deletePerson: DELETE_PERSON,
       listPositions: LIST_POSITIONS,
-    }),
-    computed: mapState<RootState>({
-      positionOptions: (state: RootState) => state.PositionModule.positions,
-    }),
+    })
   })
   export default class PersonCard extends Vue {
     private deletePerson!: (personId: string) => Promise<void>;
     private listPositions!: () => Promise<void>;
-
-    positionOptions!: DynamicOption[];
 
     @Prop(Object)
     person!: Person;
@@ -106,15 +100,8 @@
     @Prop(Boolean)
     isReadonly?: boolean;
 
-    departmentOptions = departmentOptions;
-
     fabMode = false;
     loading = false;
-
-    departmentLabel(department: Department): string {
-      const option = departmentOptions.find(({ value }) => value === department);
-      return option ? option.label : '';
-    }
 
     async onDeletePerson() {
       const confirm = await this.$root.$data.$confirmDialog(

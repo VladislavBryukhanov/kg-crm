@@ -30,7 +30,7 @@
 <script lang="ts">
   import { Vue, Component } from 'vue-property-decorator';
   import { mapActions, mapState } from 'vuex';
-  import { Person, Department } from '@/models/person';
+  import { Person } from '@/models/person';
   import PersonCard from '@/components/PersonCard.vue';
   import { LIST_PERSONS } from '@/store/action-types';
   import { RootState } from '@/models/store';

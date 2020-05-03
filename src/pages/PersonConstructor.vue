@@ -72,7 +72,7 @@
             label="Department *"
             prepend-icon="apartment"
             item-text="label"
-            item-value="value"
+            return-object
             :items="departmentOptions"
             :rules="rules.department"
             v-model="person.department"
@@ -118,10 +118,10 @@
   import { mapActions, mapState } from 'vuex';
   import { Route } from 'vue-router';
   import isEqual from 'lodash.isequal';
-  import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON, LIST_POSITIONS } from '@/store/action-types';
+  import { CREATE_PERSON, FETCH_PERSON_BY_ID, UPDATE_PERSON, LIST_POSITIONS, LIST_DEPARTMENTS } from '@/store/action-types';
   import PersonCard from '@/components/PersonCard.vue';
   import VuetifyDatePicker from '@/components/atoms/VuetifyDatePicker.vue';
-  import { Person, departmentOptions } from '@/models/person';
+  import { Person } from '@/models/person';
   import { RootState } from '@/models/store';
   import { CreatePerson, UpdatePerson } from '@/models/store/person/actions-payload';
   import { DynamicOption } from '../models/dynamic-option';
@@ -130,6 +130,7 @@
     components: { VuetifyDatePicker, PersonCard },
      computed: mapState<RootState>({
       persons: (state: RootState) => state.PersonModule.persons,
+      departmentOptions: (state: RootState) => state.DepartmentModule.departments,
       positionOptions: (state: RootState) => state.PositionModule.positions,
     }),
     methods: mapActions({ 
@@ -137,6 +138,7 @@
       fetchPerson: FETCH_PERSON_BY_ID,
       updatePerson: UPDATE_PERSON,
       listPositions: LIST_POSITIONS,
+      listDepartments: LIST_DEPARTMENTS,
     }),
   })
   export default class PersonConstructor extends Vue {
@@ -144,11 +146,11 @@
     private createPerson!: (payload: CreatePerson) => Promise<void>;
     private updatePerson!: (payload: UpdatePerson) => Promise<void>;
     private listPositions!: () => Promise<void>;
+    private listDepartments!: () => Promise<void>;
 
     persons!: Person[];
     positionOptions!: DynamicOption[];
-
-    departmentOptions = departmentOptions;
+    departmentOptions!: DynamicOption[];
 
     valid = false;
 
@@ -240,6 +242,10 @@
 
       if (!this.positionOptions.length) {
         this.listPositions();
+      }
+
+      if (!this.departmentOptions.length) {
+        this.listDepartments();
       }
     }
 

@@ -10,11 +10,6 @@ const actions: ActionTree<PersonState, RootState> = {
   async [FETCH_PERSON_BY_ID]({ commit }, personId: string) {
     try {
       const person = await PersonRepo.fetchById(personId);
-
-      if (person && person.avatarFileId) {
-        person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
-      }
-
       commit(FETCH_PERSON_BY_ID, person);
     } catch (err) {
       errorHandler(err, FETCH_PERSON_BY_ID, commit);
@@ -22,17 +17,7 @@ const actions: ActionTree<PersonState, RootState> = {
   },
   async [LIST_PERSONS]({ commit }) {
     try{
-      let persons = await PersonRepo.list();
-      
-      persons = await Promise.all(
-        persons.map( async (person) => {
-          if (person.avatarFileId) {
-            person.avatarUrl = await FileRepo.getPersonAvatarUrl(person.avatarFileId);
-          }
-          return person;
-        })
-      );
-          
+      const persons = await PersonRepo.list();
       commit(LIST_PERSONS, persons);
     } catch (err) {
       errorHandler(err, LIST_PERSONS, commit);
@@ -40,12 +25,7 @@ const actions: ActionTree<PersonState, RootState> = {
   },
   async [CREATE_PERSON]({ commit }, { avatar, person }: CreatePerson) {
     try {
-      if (avatar) {
-        person.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
-      }
-
       const createdPerson = await PersonRepo.create(person);
-
       commit(CREATE_PERSON, createdPerson);
     } catch (err) {
       errorHandler(err, CREATE_PERSON, commit);
