@@ -14,15 +14,15 @@ const mutations: MutationTree<AuthState> = {
     state.me = undefined;
     state.authState = AuthMode.SIGNED_OUT;
   },
-  [SCHEDULE_VACATION](state: AuthState, expectedVacation: ScheduleVacation) {
-    const { startDate, endDate } = expectedVacation;
+  [SCHEDULE_VACATION](state: AuthState, scheduledVacation: ScheduleVacation) {
+    const { startDate, endDate } = scheduledVacation;
     const startMoment = moment(startDate);
     const endMoment = moment(endDate);
 
     const vacationDuration = endMoment.diff(startMoment, 'days') + 1;
     const vacationDays = state.me!.vacationDays - vacationDuration;
 
-    state.me = { ...state.me!, expectedVacation, vacationDays };
+    state.me = { ...state.me!, scheduledVacation, vacationDays };
   },
 }
 

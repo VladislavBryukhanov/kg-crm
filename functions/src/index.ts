@@ -47,8 +47,8 @@ exports.sendVacationEmail = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('invalid-argument', 'startDate and endDate arguments required');
   }
 
-  if (new Date(endDate).getTime() > new Date(startDate).getTime()) {
-    throw new functions.https.HttpsError('invalid-argument', 'Invalid range, endDate > startDate');
+  if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid range, startDate > endDate');
   }
 
   const collectionRef = admin.firestore().collection(PERSON_COLLECTION);
@@ -84,6 +84,6 @@ exports.sendVacationEmail = functions.https.onCall(async (data, context) => {
 
   return collectionRef.doc(person.id).update({ 
     vacationDays,
-    expectedVacation: data
+    scheduledVacation: data
   });
 });

@@ -14,7 +14,7 @@
       class="d-block mx-auto mt-10"
       large
       color="secondary"
-      :disabled="!isRangeSelected || isLoading"
+      :disabled="isSchedulingInactive"
       @click="onScheduleVacation"
     >
       Schedule vacation
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-  import { Vue, Component } from 'vue-property-decorator';
+  import { Vue, Component, Watch } from 'vue-property-decorator';
   import { mapState, mapMutations, mapActions } from 'vuex';
   import moment from 'moment-mini';
   import { SHOW_SNACKBAR, SCHEDULE_VACATION } from '@/store/action-types';
@@ -58,6 +58,28 @@
       return this.vacationRange.length == 2;
     }
 
+    get isVacationScheduled() {
+      return this.profile.scheduledVacation;
+    }
+
+    get isSchedulingInactive() {
+      return !this.isRangeSelected || this.isLoading || this.isVacationScheduled;
+    }
+
+    @Watch('profile', { immediate: true, deep: true })
+    private onPersonVacationChange(profile: Person, oldProfile: Person) {
+      if (oldProfile && profile.scheduledVacation !== oldProfile.scheduledVacation) {
+        this.showSnackbar({ message: 'Your vacation schedule saved and sent to administration' });
+      }
+
+      if (!profile.scheduledVacation) return;
+
+      this.vacationRange = [
+        profile.scheduledVacation.startDate,
+        profile.scheduledVacation.endDate,
+      ];
+    }
+
     async onScheduleVacation() {
       const [startDate, endDate] = this.vacationRange;
       if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
@@ -87,9 +109,6 @@
       });
 
       this.isLoading = false;
-      this.vacationRange = [];
-
-      this.showSnackbar({ message: 'Your vacation schedule saved and sent to administration' });
     }
   }
 </script>

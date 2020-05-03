@@ -24,7 +24,7 @@ export interface PersonPrivateInfo {
   birthday?: string;
   address?: string;
 
-  expectedVacation: ScheduleVacation;
+  scheduledVacation: ScheduleVacation;
   vacationDays: number;
   sickLeaveDays: number;
   unpaidDays: number;
