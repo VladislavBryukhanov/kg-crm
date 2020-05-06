@@ -7,6 +7,7 @@
       class="date-picker"
       range
       :min="new Date().toISOString()"
+      :readonly="isVacationScheduled"
       v-model="vacationRange"
     ></v-date-picker>
 
@@ -59,7 +60,7 @@
     }
 
     get isVacationScheduled() {
-      return this.profile.scheduledVacation;
+      return !!this.profile.scheduledVacation;
     }
 
     get isSchedulingInactive() {

@@ -55,7 +55,7 @@ const actions: ActionTree<AuthState, RootState> = {
   },
   async [SCHEDULE_VACATION]({ commit }, { startDate, endDate }: ScheduleVacation) {
     try {
-      await MailerApi.sendVacationEmail(startDate, endDate);
+      await MailerApi.vacationScheduling(startDate, endDate);
       commit(SCHEDULE_VACATION, { startDate, endDate });
     } catch (err) {
       errorHandler(err, SCHEDULE_VACATION, commit);

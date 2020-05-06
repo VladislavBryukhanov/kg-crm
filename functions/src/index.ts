@@ -1,7 +1,8 @@
-import { Person } from './models/person';
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as moment from 'moment-mini';
+import { Person } from './models/person';
+import Mailer from './mailer/index';
 admin.initializeApp();
 
 const PERSON_COLLECTION = 'persons';
@@ -41,8 +42,8 @@ exports.personRemoveOldAvatar = functions.firestore
     }
   });
 
-exports.sendVacationEmail = functions.https.onCall(async (data, context) => {
-  const { startDate, endDate } = data;
+exports.vacationScheduling = functions.https.onCall(async (vacationDates, context) => {
+  const { startDate, endDate } = vacationDates;
   if (!startDate || !endDate) {
     throw new functions.https.HttpsError('invalid-argument', 'startDate and endDate arguments required');
   }
@@ -80,10 +81,11 @@ exports.sendVacationEmail = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('invalid-argument', 'You do not have so many vacation days');
   }
 
-  const vacationDays = person.vacationDays - requestedVacationDuration;
+  const recipientEmails = ['SECRET', 'SECRET'];
+  await Mailer.sendVacationMail(person, vacationDates, recipientEmails);
 
-  return collectionRef.doc(person.id).update({ 
-    vacationDays,
-    scheduledVacation: data
+  return collectionRef.doc(person.id).update({
+    vacationDays: person.vacationDays - requestedVacationDuration,
+    scheduledVacation: vacationDates
   });
 });

@@ -1,9 +1,9 @@
 import firebase from 'firebase';
 
-const sendVacationEmail = firebase.functions().httpsCallable('sendVacationEmail');
+const vacationScheduling = firebase.functions().httpsCallable('vacationScheduling');
 
 export default class MailerApi {
-  static sendVacationEmail(startDate: Date, endDate: Date): Promise<firebase.functions.HttpsCallableResult> {
-    return sendVacationEmail({ startDate, endDate });
+  static vacationScheduling(startDate: Date, endDate: Date): Promise<firebase.functions.HttpsCallableResult> {
+    return vacationScheduling({ startDate, endDate });
   }
 }
