@@ -36,7 +36,7 @@ class Mailer {
       from: `${vacation.SENDER_NAME} <${credentials.USER_EMAIL}>`,
       subject: vacation.SUBJECT,
       text: `
-        ${person.fullName} (${feedbackEmail}) planned his vacation in the period from 
+        ${person.fullName} (${feedbackEmail}) planned his vacation in the period from
         ${moment(startDate).format(dateFormat)} to ${moment(endDate).format(dateFormat)}
       `
     });

@@ -5,6 +5,7 @@
     :getAll="listPositions"
     :create="createPosition"
     :delete="deletePosition"
+    :optionConfig="optionConfig"
   ></dynamic-options-manager>
 </template>
 
@@ -14,6 +15,7 @@
   import { RootState } from '@/models/store';
   import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION } from '@/store/action-types';
   import DynamicOptionsManager from '@/components/DynamicOptionsManager.vue';
+  import { DynamicOptionProperies } from '../models/dynamic-option';
 
   @Component({
     components: { DynamicOptionsManager },
@@ -26,5 +28,18 @@
       deletePosition: DELETE_POSITION,
     }),
   })
-  export default class PositionManager extends Vue {}
+  export default class PositionManager extends Vue {
+    optionConfig: DynamicOptionProperies[] = [
+      {
+        label: 'Watch all vacations',
+        icon: 'event_note',
+        modelKey: 'watchAll',
+      },
+      {
+        label: 'Watch department vacations',
+        icon: 'event',
+        modelKey: 'watchDepartment',
+      }
+    ]
+  }
 </script>

@@ -14,13 +14,47 @@
             <v-text-field 
               solo
               light 
-              v-model="newOption"
+              v-model="newOptionLabel"
               :placeholder="`Add new ${entityName}`"
-              append-icon="library_add"
-              @click:append="onAddOption"
               @keyup.enter="onAddOption"
               :disabled="isItemProcessing"
             >
+              <template slot="append">
+                <v-menu v-if="optionConfig">
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon v-if="selectedConfigPropKey" color="primary">
+                        {{selectedConfigPropKey.icon}}
+                      </v-icon>
+                      <v-icon v-else>
+                        settings
+                      </v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item-group v-model="selectedConfigPropKey" color="primary">
+                      <v-list-item 
+                        v-for="config in optionConfig"
+                        :value="config"
+                        :key="config.modelKey"
+                      >
+                        <v-list-item-icon>
+                          <v-icon>{{config.icon}}</v-icon>
+                        </v-list-item-icon>
+
+                        <v-list-item-content>
+                          {{config.label}}
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-item-group>
+                  </v-list>
+                </v-menu>
+
+                <v-btn icon @click="onAddOption">
+                  <v-icon>library_add</v-icon>
+                </v-btn>
+              </template>
             </v-text-field>
 
             <v-container v-if="isLoading && !options.length">
@@ -46,6 +80,10 @@
                 <v-list-item-title v-text="option.label"></v-list-item-title>
               </v-list-item-content>
 
+              <v-icon color="primary" v-if="getConfigOptionIcon(option)">
+                {{getConfigOptionIcon(option)}}
+              </v-icon>
+
               <v-list-item-action>
                 <v-btn icon @click="onRemoveOption(option)">
                   <v-icon color="red darken-2">delete_forever</v-icon>
@@ -64,7 +102,7 @@
   import { mapState, mapActions, mapMutations } from 'vuex';
   import { RootState, SnackBar } from '@/models/store';
   import { CreateEntity } from '@/models/common';
-  import { DynamicOption } from '@/models/dynamic-option';
+  import { DynamicOption, DynamicOptionProperies, PositionConfig } from '@/models/dynamic-option';
   import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION, SHOW_SNACKBAR } from '@/store/action-types';
   import capitalize from 'lodash.capitalize';
 
@@ -92,12 +130,15 @@
     @Prop(String)
     entityName!: string;
 
+    @Prop(Array)
+    optionConfig?: DynamicOptionProperies[];
 
     readonly skeletonItems = 4;
     isLoading = true;
-
     isItemProcessing = false;
-    newOption = '';
+
+    newOptionLabel = '';
+    selectedConfigPropKey: DynamicOptionProperies | null = null;
 
     created() {
       this.isLoading = !this.options.length;
@@ -111,6 +152,14 @@
     // TODO implement edit mode
     // TODO check unique
 
+    getConfigOptionIcon(option: DynamicOption) {
+      if (!this.optionConfig) return;
+
+      const targetItem = this.optionConfig.find(({ modelKey }) => Object.keys(option).includes(modelKey));
+
+      return targetItem && targetItem.icon;
+    }
+
     validateOption(optionName: string) {
       if (optionName.length >= 2 && optionName.length <= 48) {
         return true;
@@ -122,17 +171,26 @@
     }
 
     async onAddOption() {
-      if (!this.validateOption(this.newOption)) return;
+      if (!this.validateOption(this.newOptionLabel)) return;
 
       const confirm = await this.$root.$data.$confirmDialog(
         'Confirm creating',
-        `Are you sure you want to create ${this.newOption} ${this.entityName}`
+        `Are you sure you want to create ${this.newOptionLabel} ${this.entityName}`
       );
 
       if (confirm) {
         this.isItemProcessing = true;
-        await this.create({ label: this.newOption });
-        this.newOption = '';
+
+        const option: CreateEntity<DynamicOption> = { label: this.newOptionLabel };
+
+        if (this.selectedConfigPropKey) {
+          option[this.selectedConfigPropKey.modelKey] = true;
+        }
+
+        await this.create(option);
+
+        this.newOptionLabel = '';
+        this.selectedConfigPropKey = null;
         this.isItemProcessing = false;
       }
     }
