@@ -79,10 +79,15 @@
               <v-list-item-content>
                 <v-list-item-title v-text="option.label"></v-list-item-title>
               </v-list-item-content>
-
-              <v-icon color="primary" v-if="getConfigOptionIcon(option)">
-                {{getConfigOptionIcon(option)}}
-              </v-icon>
+              
+              <v-tooltip v-if="getConfigOption(option)" top>
+                <template v-slot:activator="{ on }">
+                  <v-icon color="primary" v-on="on">
+                    {{getConfigOption(option).icon}}
+                  </v-icon>
+                </template>
+                <span>{{getConfigOption(option).label}}</span>
+              </v-tooltip>
 
               <v-list-item-action>
                 <v-btn icon @click="onRemoveOption(option)">
@@ -105,6 +110,7 @@
   import { DynamicOption, DynamicOptionProperies, PositionConfig } from '@/models/dynamic-option';
   import { LIST_POSITIONS, CREATE_POSITION, DELETE_POSITION, SHOW_SNACKBAR } from '@/store/action-types';
   import capitalize from 'lodash.capitalize';
+  import memoize from 'lodash.memoize';
 
   @Component({
     name: 'dynamic-options-manager',
@@ -152,13 +158,10 @@
     // TODO implement edit mode
     // TODO check unique
 
-    getConfigOptionIcon(option: DynamicOption) {
-      if (!this.optionConfig) return;
-
-      const targetItem = this.optionConfig.find(({ modelKey }) => Object.keys(option).includes(modelKey));
-
-      return targetItem && targetItem.icon;
-    }
+    getConfigOption = memoize((option: DynamicOption) =>
+      this.optionConfig && this.optionConfig.find(({ modelKey }) => Object.keys(option).includes(modelKey)),
+      (option: DynamicOption) => option.id
+    )
 
     validateOption(optionName: string) {
       if (optionName.length >= 2 && optionName.length <= 48) {

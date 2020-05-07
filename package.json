@@ -11,10 +11,12 @@
   "dependencies": {
     "@types/lodash.capitalize": "^4.2.6",
     "@types/lodash.isequal": "^4.5.5",
+    "@types/lodash.memoize": "^4.1.6",
     "core-js": "^3.6.4",
     "firebase": "^7.13.2",
     "lodash.capitalize": "^4.2.1",
     "lodash.isequal": "^4.5.0",
+    "lodash.memoize": "^4.1.2",
     "material-design-icons-iconfont": "^5.0.1",
     "moment-mini": "^2.24.0",
     "uuidv4": "^6.0.7",
