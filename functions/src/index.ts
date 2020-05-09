@@ -4,6 +4,7 @@ import * as moment from 'moment-mini';
 import { Person } from './models/person';
 import Mailer from './mailer/index';
 import { complexQueryResult, queryResultRefs } from './helpers/complexQueryResult';
+import { FieldValue } from '@google-cloud/firestore';
 admin.initializeApp();
 
 const POSITION_COLLECTION = 'positions';
@@ -135,4 +136,27 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
     vacationDays: person.vacationDays - requestedVacationDuration,
     scheduledVacation: vacationDates
   });
+});
+
+  exports.scheduledVacationDaysManager = functions.pubsub.schedule('* * * * 1').onRun(async context => {
+  const VACATION_MONTH_TICK = 2;
+
+  const batch = admin.firestore().batch();
+  const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
+  const personsSnapshot = await personCollectionRef.get();
+
+  personsSnapshot.docs.forEach(document =>  {
+    const person = document.data();
+    const hiredMonthAgo = !!moment(context.timestamp).diff(moment(person.hiredAt), 'month');
+    const updatedMonthAgo = !!moment(context.timestamp).diff(moment(person.vacationDaysUpdatedAt), 'month');
+
+    if (!hiredMonthAgo || (person.vacationDaysUpdatedAt && !updatedMonthAgo)) return;
+
+    batch.update(document.ref, {
+      vacationDays: FieldValue.increment(VACATION_MONTH_TICK),
+      vacationDaysUpdatedAt: context.timestamp
+    })
+  });
+  
+  await batch.commit();
 });
