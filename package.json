@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && firebase deploy"
+    "deploy": "npm run build && firebase deploy",
+    "deploy:func": "firebase deploy --only functions"
   },
   "dependencies": {
     "@types/lodash.capitalize": "^4.2.6",

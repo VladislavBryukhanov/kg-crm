@@ -3,8 +3,10 @@ import * as admin from 'firebase-admin';
 import * as moment from 'moment-mini';
 import { Person } from './models/person';
 import Mailer from './mailer/index';
+import { complexQueryResult, queryResultRefs } from './helpers/complexQueryResult';
 admin.initializeApp();
 
+const POSITION_COLLECTION = 'positions';
 const PERSON_COLLECTION = 'persons';
 const PERSON_AVATAR_DIR = 'person_avatar';
 
@@ -52,9 +54,10 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
     throw new functions.https.HttpsError('invalid-argument', 'Invalid range, startDate > endDate');
   }
 
-  const collectionRef = admin.firestore().collection(PERSON_COLLECTION);
+  const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
+  const positionCollectionRef = admin.firestore().collection(POSITION_COLLECTION);
 
-  const querySnapshot = await collectionRef
+  const querySnapshot = await personCollectionRef
     .where('gmail', '==', context.auth!.token.email)
     .limit(1)
     .get();
@@ -81,10 +84,36 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
     throw new functions.https.HttpsError('invalid-argument', 'You do not have so many vacation days');
   }
 
-  const recipientEmails = ['SECRET', 'SECRET'];
-  await Mailer.sendVacationMail(person, vacationDates, recipientEmails);
+  const watchAllPositions = await queryResultRefs(
+      positionCollectionRef.where('watchAll', '==', true)
+  );
 
-  return collectionRef.doc(person.id).update({
+  const watchDepartmentPositions =  await queryResultRefs(
+    positionCollectionRef.where('watchDepartment', '==', true)
+  ); 
+
+  const recipients: Person[] = await complexQueryResult<Person>([
+    personCollectionRef
+      .where('positionRef', 'in', watchDepartmentPositions)
+      .where('departmentRef', '==', person.departmentRef)
+      .get(),
+
+    personCollectionRef
+      .where('positionRef', 'in', watchAllPositions)
+      .get(),
+  ]);
+
+  if (!recipients.length) {
+    throw new functions.https.HttpsError('not-found', 'No recipients of email exists, please inform your manager');
+  }
+
+  await Mailer.sendVacationMail(
+    person,
+    vacationDates,
+    recipients.map(pers => pers.corporateMail || pers.gmail)
+  );
+
+  return personCollectionRef.doc(person.id).update({
     vacationDays: person.vacationDays - requestedVacationDuration,
     scheduledVacation: vacationDates
   });
