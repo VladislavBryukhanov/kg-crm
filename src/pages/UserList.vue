@@ -52,13 +52,12 @@
     readonly skeletonItems = 4;
     isLoading = true;
 
-    created() {
+    async created() {
       this.isLoading = !this.persons.length;
 
-      if (this.isLoading) {
-        this.listPersons()
-          .then(res => this.isLoading = false);
-      }
+      await this.listPersons();
+
+      this.isLoading = false;
     }
   }
 </script>

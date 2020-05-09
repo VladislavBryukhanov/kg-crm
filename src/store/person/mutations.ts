@@ -24,7 +24,7 @@ const mutations: MutationTree<PersonState> = {
     
     if (~index) {
       const updatedPerson = { ...state.persons[index], ...updates };
-      state.persons.splice(index, 1, updatedPerson)
+      state.persons.splice(index, 1, updatedPerson);
     }
   },
   [DELETE_PERSON](state: PersonState, personId: string) {

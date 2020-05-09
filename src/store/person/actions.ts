@@ -38,12 +38,9 @@ const actions: ActionTree<PersonState, RootState> = {
       }
 
       await PersonRepo.update(personId, updates);
+      const updatedUser = await PersonRepo.fetchById(personId);
 
-      if (updates.avatarFileId) {
-        updates.avatarUrl = await FileRepo.getPersonAvatarUrl(updates.avatarFileId);
-      }
-
-      commit(UPDATE_PERSON, { personId, updates });
+      commit(UPDATE_PERSON, { personId, updates: updatedUser });
     } catch (err) {
       errorHandler(err, UPDATE_PERSON, commit);
     }

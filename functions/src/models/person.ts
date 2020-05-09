@@ -19,7 +19,7 @@ export interface Person extends PersonPrivateInfo {
 };
 
 export interface PersonPrivateInfo {
-  gmail?: string;
+  gmail: string;
   phone?: string;
   birthday?: string;
   address?: string;
