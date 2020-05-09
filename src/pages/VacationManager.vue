@@ -7,7 +7,7 @@
       class="date-picker"
       range
       :min="new Date().toISOString()"
-      :readonly="isVacationScheduled"
+      :readonly="!iScheduledVacationCompleted"
       v-model="vacationRange"
     ></v-date-picker>
 
@@ -59,12 +59,16 @@
       return this.vacationRange.length == 2;
     }
 
-    get isVacationScheduled() {
-      return !!this.profile.scheduledVacation;
+    get iScheduledVacationCompleted() {
+      const { scheduledVacation } = this.profile;
+
+      if (!scheduledVacation) return true;
+      
+      return new Date().getTime() > new Date(scheduledVacation.endDate).getTime();
     }
 
     get isSchedulingInactive() {
-      return !this.isRangeSelected || this.isLoading || this.isVacationScheduled;
+      return !this.isRangeSelected || this.isLoading || !this.iScheduledVacationCompleted;
     }
 
     @Watch('profile', { immediate: true, deep: true })

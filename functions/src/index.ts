@@ -50,7 +50,18 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
     throw new functions.https.HttpsError('invalid-argument', 'startDate and endDate arguments required');
   }
 
-  if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
+  const vacStartTime = new Date(startDate).getTime();
+  const vacEndTime = new Date(endDate).getTime();
+  const now = new Date().getTime();
+
+  if (vacEndTime < now) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'Invalid range, vacation could not to be scheduled in the past'
+    );
+  }
+
+  if (vacStartTime > vacEndTime) {
     throw new functions.https.HttpsError('invalid-argument', 'Invalid range, startDate > endDate');
   }
 
@@ -74,6 +85,13 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
 
   if (!person) {
     throw new functions.https.HttpsError('not-found', 'Such user doesn\'t exists');
+  }
+
+  if (new Date(person.scheduledVacation.endDate).getTime() > now) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'Unable to schedule new vacation as you have active vacation schedule'
+    );
   }
   
   const startMoment = moment(startDate);
