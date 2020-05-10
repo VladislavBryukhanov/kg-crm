@@ -11,6 +11,8 @@ const POSITION_COLLECTION = 'positions';
 const PERSON_COLLECTION = 'persons';
 const PERSON_AVATAR_DIR = 'person_avatar';
 
+const VACATION_INCREMENT_KEY = 'vacation_year_limit';
+
 exports.personCascadeDelete = functions.firestore
   .document(`${PERSON_COLLECTION}/{personId}`)
   .onDelete(async (snap) => {
@@ -138,8 +140,22 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
   });
 });
 
-  exports.scheduledVacationDaysManager = functions.pubsub.schedule('* * * * 1').onRun(async context => {
-  const VACATION_MONTH_TICK = 2;
+exports.scheduledVacationDaysManager = functions.pubsub.schedule('* * * * 1').onRun(async context => {
+  let vacationDaysPerYear = 0;
+
+  const configTemplate = await admin.remoteConfig().getTemplate();
+  const { defaultValue } = configTemplate.parameters[VACATION_INCREMENT_KEY];
+
+  if (defaultValue && 'value' in defaultValue) {
+    vacationDaysPerYear = +defaultValue.value;
+  }
+
+  if (!vacationDaysPerYear) {
+    console.warn("Vacation Days Per Year doesn't set, please check remote config");
+    return;
+  }
+
+  const vacationMonthIncrement = vacationDaysPerYear / 12;
 
   const batch = admin.firestore().batch();
   const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
@@ -153,10 +169,10 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
     if (!hiredMonthAgo || (person.vacationDaysUpdatedAt && !updatedMonthAgo)) return;
 
     batch.update(document.ref, {
-      vacationDays: FieldValue.increment(VACATION_MONTH_TICK),
+      vacationDays: FieldValue.increment(vacationMonthIncrement),
       vacationDaysUpdatedAt: context.timestamp
     })
   });
   
-  await batch.commit();
+  return batch.commit();
 });
