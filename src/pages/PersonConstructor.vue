@@ -5,99 +5,168 @@
     </v-overlay>
 
     <v-layout justify-center>
-      <person-card 
-        maxWidth="320"
-        :person="person"
-        :isReadonly="true"
-      ></person-card>
-    </v-layout>
-    <v-form v-model="valid">
-      <v-row>
-        <v-col cols="6">
-          <v-text-field 
-            prepend-icon="contacts"
-            label="Full name *" 
-            v-model="person.fullName" 
-            :rules="rules.fullName"
-            counter="64"
-            cleaable
-          ></v-text-field>
-          <v-text-field 
-            prepend-icon="email"
-            label="Gmail *" 
-            v-model="person.gmail" 
-            :rules="rules.gmail"
-            cleaable
-          ></v-text-field>
-          <v-text-field 
-            prepend-icon="phone"
-            label="Phone *" 
-            v-model="person.phone" 
-            :rules="rules.phone"
-            cleaable
-          ></v-text-field>
-          <v-text-field 
-            prepend-icon="location_on"
-            label="Address"
-            v-model="person.address"
-            cleaable
-          ></v-text-field>
-          <vuetify-date-picker 
-            label="Birthday"
-            :date.sync="person.birthday"
-          ></vuetify-date-picker>
-          <v-textarea 
-            solo 
-            label="Additional information"
-            v-model="person.additionalInfo"
-          ></v-textarea>
-        </v-col>
+      <div>
+        <person-card 
+          maxWidth="320"
+          :person="person"
+          :isReadonly="true"
+        ></person-card>
+      </div>
+      
+      <v-sheet
+        class="ml-8 pa-6"
+        elevation="2"
+      >
+        <v-form v-model="valid">
+          <h3 class="headline primary--text">
+            Personal profile
+          </h3>
 
-        <v-col cols="6">
-          <v-file-input
-            label="Avatar"
-            prepend-icon="camera_alt"
-            accept="image/*"
-            clerable
-            :rules="rules.avatar"
-            @change="onAvatarChanged"
-          ></v-file-input>
-          <v-text-field 
-            prepend-icon="mail_outline"
-            label="Corporate email"
-            v-model="person.corporateMail"
-            clerable
-          ></v-text-field>
-          <v-select
-            label="Department *"
-            prepend-icon="apartment"
-            item-text="label"
-            return-object
-            :items="departmentOptions"
-            :rules="rules.department"
-            v-model="person.department"
-          ></v-select>
-          <v-select
-            label="Position *"
-            prepend-icon="business_center"
-            item-text="label"
-            return-object
-            :items="positionOptions"
-            :rules="rules.position"
-            v-model="person.position"
-          ></v-select>
-          <vuetify-date-picker
-            label="Hiring date *"
-            :date.sync="person.hiredAt"
-          ></vuetify-date-picker>
-          <v-textarea
-            solo
-            label="Development plan"
-            v-model="person.developmentPlan"
-          ></v-textarea>
-        </v-col>
-      </v-row>
-    </v-form>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field 
+                prepend-icon="contacts"
+                label="Full name *" 
+                v-model="person.fullName" 
+                :rules="rules.fullName"
+                counter="64"
+                clearable
+              ></v-text-field>
+              <v-text-field 
+                prepend-icon="email"
+                label="Gmail *" 
+                v-model="person.gmail" 
+                :rules="rules.gmail"
+                clearable
+              ></v-text-field>
+              <v-text-field 
+                prepend-icon="phone"
+                label="Phone *" 
+                v-model="person.phone" 
+                :rules="rules.phone"
+                clearable
+              ></v-text-field>
+              <v-text-field 
+                prepend-icon="location_on"
+                label="Address"
+                v-model="person.address"
+                clearable
+              ></v-text-field>
+              <vuetify-date-picker 
+                label="Birthday"
+                :date.sync="person.birthday"
+              ></vuetify-date-picker>
+              <v-textarea 
+                solo 
+                label="Additional information"
+                v-model="person.additionalInfo"
+              ></v-textarea>
+            </v-col>
+
+            <v-col cols="6">
+              <v-file-input
+                label="Avatar"
+                prepend-icon="camera_alt"
+                accept="image/*"
+                clerable
+                :rules="rules.avatar"
+                @change="onAvatarChanged"
+              ></v-file-input>
+              <v-text-field 
+                prepend-icon="mail_outline"
+                label="Corporate email"
+                v-model="person.corporateMail"
+                clerable
+              ></v-text-field>
+              <v-select
+                label="Department *"
+                prepend-icon="apartment"
+                item-text="label"
+                return-object
+                :items="departmentOptions"
+                :rules="rules.department"
+                v-model="person.department"
+              ></v-select>
+              <v-select
+                label="Position *"
+                prepend-icon="business_center"
+                item-text="label"
+                return-object
+                :items="positionOptions"
+                :rules="rules.position"
+                v-model="person.position"
+              ></v-select>
+              <vuetify-date-picker
+                label="Hiring date *"
+                :date.sync="person.hiredAt"
+              ></vuetify-date-picker>
+              <v-textarea
+                solo
+                label="Development plan"
+                v-model="person.developmentPlan"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+          
+          <div>
+            <v-divider></v-divider>
+
+            <h3 class="headline primary--text mt-5">
+              Days off statistics
+            </h3>
+
+
+            <v-row>
+              <v-col cols="12" v-if="person.scheduledVacation">
+                <h3 class="subtitle-1 secondary--text mx-4">
+                  Last scheduled vacation
+                </h3>
+              </v-col>
+
+              <v-col cols="6" v-if="person.scheduledVacation" class="px-8">
+                <v-layout justify-space-between class="secondary-text body-2">
+                  <span>{{person.scheduledVacation.startDate | date('DD MMMM YYYY')}}</span>
+                  <span>{{person.scheduledVacation.endDate | date('DD MMMM YYYY')}}</span>
+                </v-layout>
+                <v-layout justify-space-between class="font-weight-thin caption">
+                  <span>Start date</span>
+                  <span>End date</span>
+                </v-layout>
+              </v-col>
+
+              <v-col cols="6">
+                <v-text-field 
+                  label="Available vacation days" 
+                  type="number"
+                  prepend-icon="beach_access"
+                  v-model.number="person.vacationDays" 
+                  :rules="rules.vacationDays"
+                  clearable
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row class="mx-4 mt-6">
+              <vuetify-date-picker
+                label="Sick leave days"
+                :multiple="true"
+                :date.sync="person.sickLeaveDays"
+              ></vuetify-date-picker>
+            </v-row>
+
+            <v-row class="mx-4 mt-6">
+              <vuetify-date-picker
+                label="Unpaid leave days"
+                :multiple="true"
+                :date.sync="person.unpaydLeaveDays"
+              ></vuetify-date-picker>
+            </v-row>
+          </div>
+          
+        </v-form>
+      </v-sheet>
+    </v-layout>
+
     <v-btn
       v-if="isDataValid"
       fab
@@ -208,7 +277,7 @@
       return !!this.$router.currentRoute.params.personId;
     }
 
-    @Watch('persons', { immediate: true, deep: true })
+    @Watch('persons', { immediate: true })
     private onPersonsChanged(persons: Person[]) {
       const { personId } = this.$router.currentRoute.params;
 
@@ -296,7 +365,6 @@
       }
       
       this.loading = false;
-      this.$router.go(-1);
     }
   }
 </script>

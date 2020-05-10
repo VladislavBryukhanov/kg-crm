@@ -26,8 +26,8 @@ export interface PersonPrivateInfo {
 
   scheduledVacation: ScheduleVacation;
   vacationDays: number;
-  sickLeaveDays: number;
-  unpaidDays: number;
+  sickLeaveDays: string[];
+  unpaidDays: string[];
 };
 
 export interface ScheduleVacation {
