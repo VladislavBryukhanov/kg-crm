@@ -23,7 +23,7 @@
               </v-container>
 
               <v-container v-else>
-                <h3 class="display-1 font-weight-light primary--text">
+                <h3 class="headline font-weight-light primary--text">
                   No document links found
                 </h3>
               </v-container>
