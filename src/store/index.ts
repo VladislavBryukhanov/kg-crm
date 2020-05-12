@@ -6,6 +6,7 @@ import { PersonModule } from './person';
 import { PositionModule } from './position';
 import { DepartmentModule } from './department';
 import { UiUtilsModule } from './ui-utils';
+import { DocumentLinkModule } from './document-link';
 
 Vue.use(Vuex);
 
@@ -16,6 +17,7 @@ const store: StoreOptions<RootState> = {
     PositionModule,
     DepartmentModule,
     UiUtilsModule,
+    DocumentLinkModule,
   }
 };
 

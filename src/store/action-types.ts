@@ -24,3 +24,8 @@ export const DELETE_POSITION = 'delete_position';
 export const LIST_DEPARTMENTS = 'list_departments';
 export const CREATE_DEPARTMENT = 'create_department';
 export const DELETE_DEPARTMENT = 'delete_department';
+
+// Document link Module
+export const LIST_DOCUMENT_LINKS = 'list_document_links';
+export const CREATE_DOCUMENT_LINK = 'create_document_link';
+export const DELETE_DOCUMENT_LINK = 'delete_document_link';

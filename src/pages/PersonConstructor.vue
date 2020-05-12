@@ -66,9 +66,9 @@
             <v-col cols="6">
               <v-file-input
                 label="Avatar"
-                prepend-icon="camera_alt"
+                prepend-icon="add_a_photo"
                 accept="image/*"
-                clerable
+                clearable
                 :rules="rules.avatar"
                 @change="onAvatarChanged"
               ></v-file-input>
@@ -76,7 +76,7 @@
                 prepend-icon="mail_outline"
                 label="Corporate email"
                 v-model="person.corporateMail"
-                clerable
+                clearable
               ></v-text-field>
               <v-select
                 label="Department *"
@@ -114,7 +114,6 @@
             <h3 class="headline primary--text mt-5">
               Days off statistics
             </h3>
-
 
             <v-row>
               <v-col cols="12" v-if="person.scheduledVacation">

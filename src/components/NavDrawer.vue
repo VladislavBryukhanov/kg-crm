@@ -108,6 +108,12 @@
         action: () => this.navigateTo('/vacation-manager'),
       },
       { 
+        title: 'Document links',
+        icon: 'link',
+        pathName: 'DocumentLinks',
+        action: () => this.navigateTo('/doc-link-manager'),
+      },
+      { 
         title: 'Sign out',
         icon: 'power_settings_new',
         action: this.signOut,

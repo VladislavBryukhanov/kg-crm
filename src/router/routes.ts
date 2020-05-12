@@ -46,6 +46,11 @@ const routes: Array<RouteConfig> = [
         path: '/vacation-manager',
         name: 'VacationManager',
         component: () => import('@/pages/VacationManager.vue'),
+      },
+      {
+        path: '/doc-link-manager',
+        name: 'DocumentLinks',
+        component: () => import('@/pages/DocumentLinksManager.vue'),
       }
     ]
   }

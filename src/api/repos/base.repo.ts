@@ -1,14 +1,16 @@
+import { CreateEntity } from '../../models/common';
 import firebase from 'firebase';
 const db = firebase.firestore();
 
 export interface CRUD<T> {
+  fetchById(id: string): Promise<T | undefined>;
   list(): Promise<T[]>;
   create(item: T): Promise<T>;
   update(itemId: string, updates: Partial<T>): Promise<void>,
   delete(itemId: string): Promise<void>,
 }
 
-export class BaseRepo<T> implements CRUD<T>{
+export abstract class BaseRepo<T> implements CRUD<T>{
   collectionRef!: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
 
   constructor(collection: string) {
@@ -39,7 +41,7 @@ export class BaseRepo<T> implements CRUD<T>{
     });
   }
 
-  async create(item: T): Promise<T> {
+  async create(item: CreateEntity<T>): Promise<T> {
     const itemSnapshot = await this.collectionRef.add(item)
       .then(snapshot => snapshot.get());
 

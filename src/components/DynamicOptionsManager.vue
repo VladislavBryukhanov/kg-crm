@@ -57,20 +57,22 @@
               </template>
             </v-text-field>
 
-            <v-container v-if="isLoading && !options.length">
-              <v-skeleton-loader
-                v-for="n in skeletonItems"
-                :key="n"
-                height="54"
-                type="list-item"
-              ></v-skeleton-loader>
-            </v-container>
+            <template v-if="!options.length">
+              <v-container v-if="isLoading">
+                <v-skeleton-loader
+                  v-for="n in skeletonItems"
+                  :key="n"
+                  height="54"
+                  type="list-item"
+                ></v-skeleton-loader>
+              </v-container>
 
-            <v-container v-else-if="!isLoading && !options.length">
-              <h3 class="display-1 font-weight-light primary--text">
-                No {{entityName}}s found
-              </h3>
-            </v-container>
+              <v-container v-else>
+                <h3 class="display-1 font-weight-light primary--text">
+                  No {{entityName}}s found
+                </h3>
+              </v-container>
+            </template>
 
             <v-list-item
               v-for="option in options"
