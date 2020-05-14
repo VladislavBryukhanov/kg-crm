@@ -12,7 +12,7 @@
 
       <v-card-text>
         <p class="display-1 text--secondary">
-          Sign in
+          Authentication
         </p>
       </v-card-text>
       <v-card-actions>
@@ -29,7 +29,7 @@
   import DocumentListDialog from '@/components/DocumentListDialog.vue';
 
   @Component({ 
-    methods: mapActions({ 
+    methods: mapActions({
       signIn: SIGN_IN,
     }),
   })

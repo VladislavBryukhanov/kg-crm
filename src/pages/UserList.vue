@@ -21,7 +21,7 @@
         :key="person.id"
         :cols="6"
       >
-        <person-card maxWidth="320" :person="person"></person-card>
+        <person-card :isReadonly="!profile.isAdmin" maxWidth="320" :person="person"></person-card>
       </v-col>
     </v-row>
   </v-container>
@@ -38,6 +38,7 @@
   @Component({ 
     components: { PersonCard },
     computed: mapState<RootState>({
+      profile: (state: RootState) => state.AuthModule.me,
       persons: (state: RootState) => state.PersonModule.persons
     }),
     methods: mapActions({

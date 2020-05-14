@@ -83,6 +83,7 @@
                 prepend-icon="apartment"
                 item-text="label"
                 return-object
+                :disabled="!profile.isAdmin"
                 :items="departmentOptions"
                 :rules="rules.department"
                 v-model="person.department"
@@ -92,12 +93,14 @@
                 prepend-icon="business_center"
                 item-text="label"
                 return-object
+                :disabled="!profile.isAdmin"
                 :items="positionOptions"
                 :rules="rules.position"
                 v-model="person.position"
               ></v-select>
               <vuetify-date-picker
                 label="Hiring date *"
+                :disabled="!profile.isAdmin"
                 :date.sync="person.hiredAt"
               ></vuetify-date-picker>
               <v-textarea
@@ -140,6 +143,7 @@
                   prepend-icon="beach_access"
                   v-model.number="person.vacationDays" 
                   :rules="rules.vacationDays"
+                  :disabled="!profile.isAdmin"
                   clearable
                 ></v-text-field>
               </v-col>
@@ -150,6 +154,7 @@
                 label="Sick leave days"
                 :multiple="true"
                 :date.sync="person.sickLeaveDays"
+                :disabled="!profile.isAdmin"
               ></vuetify-date-picker>
             </v-row>
 
@@ -158,6 +163,7 @@
                 label="Unpaid leave days"
                 :multiple="true"
                 :date.sync="person.unpaydLeaveDays"
+                :disabled="!profile.isAdmin"
               ></vuetify-date-picker>
             </v-row>
           </div>
@@ -197,6 +203,7 @@
   @Component({
     components: { VuetifyDatePicker, PersonCard },
      computed: mapState<RootState>({
+      profile: (state: RootState) => state.AuthModule.me,
       persons: (state: RootState) => state.PersonModule.persons,
       departmentOptions: (state: RootState) => state.DepartmentModule.departments,
       positionOptions: (state: RootState) => state.PositionModule.positions,

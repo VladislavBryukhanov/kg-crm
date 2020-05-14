@@ -1,3 +1,4 @@
+import { SIGN_OUT } from './../store/action-types';
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes';
@@ -19,6 +20,11 @@ router.beforeEach(async (to, from, next) => {
 
   if (!AuthModule.authState) {
     await store.dispatch(CHECK_AUTH);
+  }
+
+  if (to.matched.some((route => route.meta.requiredAdmin)) && (!AuthModule.me || !AuthModule.me.isAdmin)) {
+    await store.dispatch(SIGN_OUT);
+    redirectParams = { name: 'SignIn' };
   }
 
   if (to.matched.some((route => route.meta.requiredAuth))) {

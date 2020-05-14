@@ -11,6 +11,7 @@
       <v-text-field 
         v-if="!multiple"
         v-model="dateBuffer"
+        :disabled="disabled"
         :label="label"
         prepend-icon="event"
         v-on="on"
@@ -23,6 +24,7 @@
         chips
         small-chips
         v-model="dateBuffer"
+        :disabled="disabled"
         :label="label"
         prepend-icon="event_note"
         v-on="on"
@@ -53,6 +55,9 @@
 
     @Prop(Boolean)
     multiple?: boolean;
+
+    @Prop(Boolean)
+    disabled?: boolean;
 
     timePickerMenu = false;
     dateBuffer: string | string[] | null = null;

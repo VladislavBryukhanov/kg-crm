@@ -26,6 +26,7 @@ const routes: Array<RouteConfig> = [
         path: '/new-person',
         name: 'CreatePerson',
         component: () => import('@/pages/PersonConstructor.vue'),
+        meta: { requiredAdmin: true },
       },
       {
         path: '/edit-person/:personId',
@@ -36,11 +37,13 @@ const routes: Array<RouteConfig> = [
         path: '/manage-position',
         name: 'ManagePosition',
         component: () => import('@/pages/PositionManager.vue'),
+        meta: { requiredAdmin: true },
       },
       {
         path: '/manage-department',
         name: 'ManageDepartment',
         component: () => import('@/pages/DepartmentManager.vue'),
+        meta: { requiredAdmin: true },
       },
       {
         path: '/vacation-manager',
@@ -51,6 +54,7 @@ const routes: Array<RouteConfig> = [
         path: '/doc-link-manager',
         name: 'DocumentLinks',
         component: () => import('@/pages/DocumentLinksManager.vue'),
+        meta: { requiredAdmin: true },
       }
     ]
   }

@@ -30,7 +30,7 @@
       <v-list-item-group :value="activeRoute">
         <v-list-item
           link
-          v-for="item in items"
+          v-for="item in displayedMenuItems"
           :key="item.title"
           @click.stop="item.action"
         >
@@ -76,7 +76,7 @@
 
     mini = true;
     drawer = true;
-    items = [
+    menuItems = [
       { 
         title: 'Person list',
         icon: 'supervised_user_circle',
@@ -88,18 +88,21 @@
         icon: 'person_add',
         pathName: 'CreatePerson',
         action: () => this.navigateTo('/new-person'),
+        requiredAdmin: true,
       },
       {
         title: 'Manage departments',
         icon: 'apartment',
         pathName: 'ManageDepartment',
-        action: () => this.navigateTo('/manage-department')
+        action: () => this.navigateTo('/manage-department'),
+        requiredAdmin: true,
       },
       {
         title: 'Manage positions',
         icon: 'business_center',
         pathName: 'ManagePosition',
-        action: () => this.navigateTo('/manage-position')
+        action: () => this.navigateTo('/manage-position'),
+        requiredAdmin: true,
       },
       { 
         title: 'Vacation',
@@ -112,6 +115,7 @@
         icon: 'link',
         pathName: 'DocumentLinks',
         action: () => this.navigateTo('/doc-link-manager'),
+        requiredAdmin: true,
       },
       { 
         title: 'Sign out',
@@ -122,13 +126,17 @@
 
     activeRoute!: number;
 
+    get displayedMenuItems() {
+      return this.menuItems.filter(menuItem => menuItem.requiredAdmin === this.profile.isAdmin);
+    }
+
     created() {
-      this.activeRoute = this.items.findIndex(({ pathName }) => pathName === this.$router.currentRoute.name)
+      this.activeRoute = this.menuItems.findIndex(({ pathName }) => pathName === this.$router.currentRoute.name)
     }
 
     @Watch('$route')
     private onRouteChange(to: Route, from: Route) {
-      this.activeRoute = this.items.findIndex(({ pathName }) => pathName === to.name);
+      this.activeRoute = this.menuItems.findIndex(({ pathName }) => pathName === to.name);
     }
 
     goToEditProfile() {

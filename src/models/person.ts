@@ -19,6 +19,8 @@ export interface Person extends PersonPrivateInfo {
 };
 
 export interface PersonPrivateInfo {
+  isAdmin: boolean;
+
   gmail: string;
   phone?: string;
   birthday?: string;
