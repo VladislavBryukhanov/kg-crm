@@ -1,4 +1,4 @@
-import { SIGN_OUT } from './../store/action-types';
+import { SIGN_OUT } from '../store/action-types';
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes';
@@ -15,26 +15,32 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  let redirectParams = {};
+  const checkMeta = (targetKey: string) => to.matched.some(route => route.meta[targetKey]);
   const { AuthModule } = store.state;
+
+  let redirectParams = {};
 
   if (!AuthModule.authState) {
     await store.dispatch(CHECK_AUTH);
   }
 
-  if (to.matched.some((route => route.meta.requiredAdmin)) && (!AuthModule.me || !AuthModule.me.isAdmin)) {
+  const isMeAdmin = AuthModule.me && AuthModule.me.isAdmin;
+  const matchPersonalId = AuthModule.me && AuthModule.me.id === to.params['personId']
+
+  if (checkMeta('personal') && !isMeAdmin && !matchPersonalId) {
     await store.dispatch(SIGN_OUT);
-    redirectParams = { name: 'SignIn' };
   }
 
-  if (to.matched.some((route => route.meta.requiredAuth))) {
-    if (AuthModule.authState === AuthMode.SIGNED_OUT) {
-      redirectParams = { name: 'SignIn' };
-    }
-  } else if (to.matched.some((route => route.meta.requiredUnauth))) {
-    if (AuthModule.authState === AuthMode.SIGNED_IN) {
-      redirectParams = { name: 'Overview' };
-    }
+  if (checkMeta('requiredAdmin') && !isMeAdmin) {
+    await store.dispatch(SIGN_OUT);
+  }
+
+  if (checkMeta('requiredAuth') && AuthModule.authState === AuthMode.SIGNED_OUT) {
+    redirectParams = { name: 'SignIn' };
+  }
+  
+  if (checkMeta('requiredUnauth') && AuthModule.authState === AuthMode.SIGNED_IN) {
+    redirectParams = { name: 'Overview' };
   }
 
   next(redirectParams);

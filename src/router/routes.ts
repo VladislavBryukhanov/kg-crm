@@ -32,6 +32,7 @@ const routes: Array<RouteConfig> = [
         path: '/edit-person/:personId',
         name: 'EditPerson',
         component: () => import('@/pages/PersonConstructor.vue'),
+        meta: { personal: true }
       },
       {
         path: '/manage-position',

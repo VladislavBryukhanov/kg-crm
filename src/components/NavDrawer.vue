@@ -127,7 +127,7 @@
     activeRoute!: number;
 
     get displayedMenuItems() {
-      return this.menuItems.filter(menuItem => menuItem.requiredAdmin === this.profile.isAdmin);
+      return this.menuItems.filter(menuItem => !menuItem.requiredAdmin || menuItem.requiredAdmin === this.profile.isAdmin);
     }
 
     created() {
