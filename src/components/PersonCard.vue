@@ -112,6 +112,7 @@
       if (confirm) {
         this.loading = true;
         await this.deletePerson(this.person.id!);
+        this.loading = false;
       }
     }
 

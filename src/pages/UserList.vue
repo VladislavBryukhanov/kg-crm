@@ -5,7 +5,7 @@
         <v-col
           v-for="n in skeletonItems"
           :key="n"
-          :cols="6"
+          :cols="4"
         >
           <v-skeleton-loader
             class="mx-auto"
@@ -19,7 +19,7 @@
         v-else
          v-for="person in persons" 
         :key="person.id"
-        :cols="6"
+        :cols="4"
       >
         <person-card :isReadonly="!profile.isAdmin" maxWidth="320" :person="person"></person-card>
       </v-col>

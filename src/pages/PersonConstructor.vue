@@ -368,6 +368,8 @@
           person: newPerson,
           avatar: this.personAvatar,
         });
+
+        this.$router.push({ name: 'Persons' });
       }
       
       this.loading = false;

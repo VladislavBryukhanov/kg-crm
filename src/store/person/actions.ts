@@ -25,6 +25,10 @@ const actions: ActionTree<PersonState, RootState> = {
   },
   async [CREATE_PERSON]({ commit }, { avatar, person }: CreatePerson) {
     try {
+      if (avatar) {
+        person.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
+      }
+
       const createdPerson = await PersonRepo.create(person);
       commit(CREATE_PERSON, createdPerson);
     } catch (err) {

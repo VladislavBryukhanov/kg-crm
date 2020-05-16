@@ -38,6 +38,10 @@ const actions: ActionTree<AuthState, RootState> = {
   async [SIGN_IN]({ dispatch, commit }) {
     try {
       const authProvider = new firebase.auth.GoogleAuthProvider();
+      authProvider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
       await firebase.auth().signInWithPopup(authProvider);
 
       await dispatch(CHECK_AUTH);
