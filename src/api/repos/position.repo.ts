@@ -6,7 +6,7 @@ const POSITION_COLLECTION = 'positions';
 
 class PositionRepo extends BaseRepo<DynamicOption> {
   constructor() {
-    super(POSITION_COLLECTION)
+    super(POSITION_COLLECTION);
   }
 
   getPositionRef(positionId: string): firebase.firestore.DocumentReference {

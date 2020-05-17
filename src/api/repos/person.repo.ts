@@ -3,8 +3,11 @@ import { FileRepo } from '@/api/repos/file.repo';
 import { DynamicOption } from '@/models/dynamic-option';
 import { Person } from '@/models/person';
 import { BaseRepo } from './base.repo';
+import firebase from 'firebase';
+const db = firebase.firestore();
 
 const PERSON_COLLECTION = 'persons';
+const USER_ROLES_COLLECTION = 'user-roles';
 
 class PersonRepo extends BaseRepo<Person> {
   constructor() {
@@ -12,7 +15,10 @@ class PersonRepo extends BaseRepo<Person> {
   }
 
   private async populateData(person: Person): Promise<Person> {
+    const roleRef = db.collection(USER_ROLES_COLLECTION).doc(person.gmail);
+
     const targetRequests: Promise<any>[] = [
+      roleRef.get(),
       person.positionRef.get(),
       person.departmentRef.get(),
     ];
@@ -23,12 +29,13 @@ class PersonRepo extends BaseRepo<Person> {
       );
     }
 
-    const [positionSnap, departmentSnap, avatarUrl] = await Promise.all(targetRequests);
+    const [roleSnap, positionSnap, departmentSnap, avatarUrl] = await Promise.all(targetRequests);
 
     const position = super.snapshotToModel<DynamicOption>(positionSnap);
     const department = super.snapshotToModel<DynamicOption>(departmentSnap);
+    const role = roleSnap.data();
 
-    return { ...person, position, department, avatarUrl };
+    return { ...person, ...role, position, department, avatarUrl };
   }
 
   async fetchById(id: string): Promise<Person | undefined> {

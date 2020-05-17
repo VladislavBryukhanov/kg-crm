@@ -5,7 +5,7 @@ const DOCUMENT_LINK_COLLECTION = 'document-links';
 
 class DocumentLinkRepo extends BaseRepo<DocumentLink> {
   constructor() {
-    super(DOCUMENT_LINK_COLLECTION)
+    super(DOCUMENT_LINK_COLLECTION);
   }
 }
 

@@ -6,7 +6,7 @@ const DEPARTMENT_COLLECTION = 'departments';
 
 class DepartmentRepo extends BaseRepo<DynamicOption> {
   constructor() {
-    super(DEPARTMENT_COLLECTION)
+    super(DEPARTMENT_COLLECTION);
   }
 
   getDepartmentRef(departmentId: string): firebase.firestore.DocumentReference {
