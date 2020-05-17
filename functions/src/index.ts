@@ -1,10 +1,11 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as moment from 'moment-mini';
+import { FieldValue } from '@google-cloud/firestore';
+import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Person } from './models/person';
 import Mailer from './mailer/index';
-import { complexQueryResult, queryResultRefs } from './helpers/complexQueryResult';
-import { FieldValue } from '@google-cloud/firestore';
+import { complexQueryResult, queryResultRefs, queryGetOne } from './helpers/complexQueryResult';
 admin.initializeApp();
 
 const POSITION_COLLECTION = 'positions';
@@ -47,6 +48,40 @@ exports.personRemoveOldAvatar = functions.firestore
     }
   });
 
+exports.personalProfileUpdate = functions.https.onCall(async (updates: Partial<Person>, context: CallableContext) => {
+  const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
+  const person = await queryGetOne<Person>(
+    personCollectionRef.where('gmail', '==', context.auth!.token.email)
+  );
+
+  if (!person) {
+    throw new functions.https.HttpsError('not-found', 'Your person not found');
+  }
+  
+  const writableFields: Array<keyof Person> = [
+    'gmail',
+    'fullName',
+    'avatarFileId',
+    'additionInfo',
+    'developmentPlan',
+    'phone',
+    'birthday',
+    'address',
+  ];
+
+  const filteredUpdates = writableFields.reduce((res, key) => {
+    if (updates[key]) {
+      return {
+        ...res,
+        [key]: updates[key]
+      }
+    }
+    return res;
+  }, {});
+
+  return personCollectionRef.doc(person.id).update(filteredUpdates);
+});
+
 exports.vacationScheduling = functions.https.onCall(async (vacationDates, context) => {
   const { startDate, endDate } = vacationDates;
   if (!startDate || !endDate) {
@@ -71,26 +106,15 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
   const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
   const positionCollectionRef = admin.firestore().collection(POSITION_COLLECTION);
 
-  const querySnapshot = await personCollectionRef
-    .where('gmail', '==', context.auth!.token.email)
-    .limit(1)
-    .get();
-
-  if (querySnapshot.empty) {
-    throw new functions.https.HttpsError('not-found', 'Such user doesn\'t exists');
-  }
-
-  let person: Person | undefined;
-  querySnapshot.forEach(snapshot => person = {
-    id: snapshot.id,
-    ...snapshot.data(),
-  } as Person);
+  const person = await queryGetOne<Person>(
+    personCollectionRef.where('gmail', '==', context.auth!.token.email)
+  );
 
   if (!person) {
     throw new functions.https.HttpsError('not-found', 'Such user doesn\'t exists');
   }
 
-  if (new Date(person.scheduledVacation.endDate).getTime() > now) {
+  if (person.scheduledVacation && new Date(person.scheduledVacation.endDate).getTime() > now) {
     throw new functions.https.HttpsError(
       'invalid-argument',
       'Unable to schedule new vacation as you have active vacation schedule'
@@ -106,7 +130,7 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
   }
 
   const watchAllPositions = await queryResultRefs(
-      positionCollectionRef.where('watchAll', '==', true)
+    positionCollectionRef.where('watchAll', '==', true)
   );
 
   const watchDepartmentPositions =  await queryResultRefs(
@@ -140,39 +164,40 @@ exports.vacationScheduling = functions.https.onCall(async (vacationDates, contex
   });
 });
 
-exports.scheduledVacationDaysManager = functions.pubsub.schedule('* * * * 1').onRun(async context => {
-  let vacationDaysPerYear = 0;
+exports.scheduledVacationDaysManager = functions.pubsub.schedule('* * * * 1')
+  .onRun(async (context: functions.EventContext) => {
+    let vacationDaysPerYear = 0;
 
-  const configTemplate = await admin.remoteConfig().getTemplate();
-  const { defaultValue } = configTemplate.parameters[VACATION_INCREMENT_KEY];
+    const configTemplate = await admin.remoteConfig().getTemplate();
+    const { defaultValue } = configTemplate.parameters[VACATION_INCREMENT_KEY];
 
-  if (defaultValue && 'value' in defaultValue) {
-    vacationDaysPerYear = +defaultValue.value;
-  }
+    if (defaultValue && 'value' in defaultValue) {
+      vacationDaysPerYear = +defaultValue.value;
+    }
 
-  if (!vacationDaysPerYear) {
-    console.warn("Vacation Days Per Year doesn't set, please check remote config");
-    return;
-  }
+    if (!vacationDaysPerYear) {
+      console.warn("Vacation Days Per Year doesn't set, please check remote config");
+      return;
+    }
 
-  const vacationMonthIncrement = vacationDaysPerYear / 12;
+    const vacationMonthIncrement = vacationDaysPerYear / 12;
 
-  const batch = admin.firestore().batch();
-  const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
-  const personsSnapshot = await personCollectionRef.get();
+    const batch = admin.firestore().batch();
+    const personCollectionRef = admin.firestore().collection(PERSON_COLLECTION);
+    const personsSnapshot = await personCollectionRef.get();
 
-  personsSnapshot.docs.forEach(document =>  {
-    const person = document.data();
-    const hiredMonthAgo = !!moment(context.timestamp).diff(moment(person.hiredAt), 'month');
-    const updatedMonthAgo = !!moment(context.timestamp).diff(moment(person.vacationDaysUpdatedAt), 'month');
+    personsSnapshot.docs.forEach(document =>  {
+      const person = document.data();
+      const hiredMonthAgo = !!moment(context.timestamp).diff(moment(person.hiredAt), 'month');
+      const updatedMonthAgo = !!moment(context.timestamp).diff(moment(person.vacationDaysUpdatedAt), 'month');
 
-    if (!hiredMonthAgo || (person.vacationDaysUpdatedAt && !updatedMonthAgo)) return;
+      if (!hiredMonthAgo || (person.vacationDaysUpdatedAt && !updatedMonthAgo)) return;
 
-    batch.update(document.ref, {
-      vacationDays: FieldValue.increment(vacationMonthIncrement),
-      vacationDaysUpdatedAt: context.timestamp
-    })
+      batch.update(document.ref, {
+        vacationDays: FieldValue.increment(vacationMonthIncrement),
+        vacationDaysUpdatedAt: context.timestamp
+      })
+    });
+    
+    return batch.commit();
   });
-  
-  return batch.commit();
-});

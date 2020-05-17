@@ -353,17 +353,27 @@
     async onSave() {
       this.loading = true;
 
-      const newPerson = { ...this.person } as Person;
-      delete newPerson.id;
-      delete newPerson.avatarUrl;
-
       if (this.isEditMode) {
+        const persKeys = Object.keys(this.person) as Array<keyof Person>;
+        const updates = persKeys.reduce((res: Partial<Person>, key: keyof Person) => {
+          if (this.person[key] !== this.originalPerson![key]) {
+            return { 
+              ...res,
+              [key]: this.person[key],
+            };
+          }
+
+          return res;
+        }, {})
+        
         await this.updatePerson({ 
           personId: this.person.id!,
-          updates: newPerson,
+          updates: updates,
           avatar: this.personAvatar,
         });
       } else {
+        const newPerson = { ...this.person } as Person;
+
         await this.createPerson({ 
           person: newPerson,
           avatar: this.personAvatar,

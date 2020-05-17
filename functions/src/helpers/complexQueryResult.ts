@@ -27,3 +27,17 @@ export async function queryResultRefs(query: Query): Promise<DocumentReference[]
 
   return resultData;
 }
+
+export async function queryGetOne<T extends { id: string }>(query: Query): Promise<T | undefined> {
+  let result: T;
+
+  const querySnapshot = await query.limit(1).get();
+  if (querySnapshot.empty) return;
+
+  querySnapshot.forEach((snapshot) => result = { 
+    id: snapshot.id,
+    ...snapshot.data(),
+  } as T);
+
+  return result!;
+}

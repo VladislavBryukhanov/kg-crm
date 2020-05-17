@@ -6,7 +6,7 @@ import { SIGN_IN, SIGN_OUT, CHECK_AUTH, SCHEDULE_VACATION } from '../action-type
 import PersonRepo from '@/api/repos/person.repo';
 import { errorHandler } from '@/utils/error-handler';
 import { ScheduleVacation } from '@/models/person';
-import MailerApi from '@/api/mailer.api';
+import CloudFunctionsApi from '@/api/cloud-functions';
 
 const actions: ActionTree<AuthState, RootState> = {
   async [CHECK_AUTH]({ commit, dispatch }) {
@@ -59,7 +59,7 @@ const actions: ActionTree<AuthState, RootState> = {
   },
   async [SCHEDULE_VACATION]({ commit }, { startDate, endDate }: ScheduleVacation) {
     try {
-      await MailerApi.vacationScheduling(startDate, endDate);
+      await CloudFunctionsApi.vacationScheduling(startDate, endDate);
       commit(SCHEDULE_VACATION, { startDate, endDate });
     } catch (err) {
       errorHandler(err, SCHEDULE_VACATION, commit);

@@ -1,6 +1,5 @@
+import { personToJsonMutate } from '@/helpers/person-to-json';
 import { FileRepo } from '@/api/repos/file.repo';
-import PositionRepo from '@/api/repos/position.repo';
-import DepartmentRepo from '@/api/repos/department.repo';
 import { DynamicOption } from '@/models/dynamic-option';
 import { Person } from '@/models/person';
 import { BaseRepo } from './base.repo';
@@ -9,7 +8,7 @@ const PERSON_COLLECTION = 'persons';
 
 class PersonRepo extends BaseRepo<Person> {
   constructor() {
-    super(PERSON_COLLECTION)
+    super(PERSON_COLLECTION);
   }
 
   private async populateData(person: Person): Promise<Person> {
@@ -46,26 +45,14 @@ class PersonRepo extends BaseRepo<Person> {
   }
 
   async create(person: Person): Promise<Person>{
-    person.positionRef = PositionRepo.getPositionRef(person.position.id);
-    person.departmentRef = DepartmentRepo.getDepartmentRef(person.department.id);
-    delete person.position;
-    delete person.department;
+    personToJsonMutate(person);
 
     const createdPerson = await super.create(person)
     return this.populateData(createdPerson);
   }
 
   async update(personId: string, updates: Partial<Person>): Promise<void> {
-    if (updates.position) {
-      updates.positionRef = PositionRepo.getPositionRef(updates.position.id);
-      delete updates.position;
-    }
-
-    if (updates.department) {
-      updates.departmentRef = DepartmentRepo.getDepartmentRef(updates.department.id);
-      delete updates.department;
-    }
-    
+    personToJsonMutate(updates);
     return super.update(personId, updates);
   }
 

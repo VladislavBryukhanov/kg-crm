@@ -27,17 +27,14 @@ export abstract class BaseRepo<T> implements CRUD<T>{
   }
 
   async list(): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      this.collectionRef.get()
-        .then((querySnapshot) => {
-          const personList: T[] = [];
-          querySnapshot.forEach(snapshot =>
-            personList.push(this.snapshotToModel(snapshot))
-          );
+    const querySnapshot = await this.collectionRef.get();
+    const personList: T[] = [];
 
-          resolve(personList);
-        })
-        .catch(reject);
+    return new Promise((resolve, reject) => {
+      querySnapshot.forEach(snapshot =>
+        personList.push(this.snapshotToModel(snapshot))
+      );
+      resolve(personList);
     });
   }
 
@@ -48,11 +45,11 @@ export abstract class BaseRepo<T> implements CRUD<T>{
     return this.snapshotToModel(itemSnapshot);
   }
 
-  async update(itemId: string, updates: Partial<T>): Promise<void> {
+  update(itemId: string, updates: Partial<T>): Promise<void> {
     return this.collectionRef.doc(itemId).update(updates);
   }
 
-  async delete(itemId: string): Promise<void> {
+  delete(itemId: string): Promise<void> {
     return this.collectionRef.doc(itemId).delete();
   }
 }

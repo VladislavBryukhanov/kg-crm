@@ -5,6 +5,7 @@ import PersonRepo from '@/api/repos/person.repo';
 import { FileRepo } from '@/api/repos/file.repo';
 import { UpdatePerson, CreatePerson } from '@/models/store/person/actions-payload';
 import { errorHandler } from '@/utils/error-handler';
+import CloudFunctionsApi from '@/api/cloud-functions';
 
 const actions: ActionTree<PersonState, RootState> = {
   async [FETCH_PERSON_BY_ID]({ commit }, personId: string) {
@@ -35,13 +36,18 @@ const actions: ActionTree<PersonState, RootState> = {
       errorHandler(err, CREATE_PERSON, commit);
     }
   },
-  async [UPDATE_PERSON]({ commit }, { personId, updates, avatar }: UpdatePerson) {
+  async [UPDATE_PERSON]({ commit, rootState }, { personId, updates, avatar }: UpdatePerson) {
     try {
       if (avatar) {
         updates.avatarFileId = await FileRepo.uploadPersonAvatar(avatar);
       }
+      
+      if (rootState.AuthModule.me!.isAdmin) {
+        await PersonRepo.update(personId, updates);
+      } else {
+        await CloudFunctionsApi.personalProfileUpdate(updates);
+      }
 
-      await PersonRepo.update(personId, updates);
       const updatedUser = await PersonRepo.fetchById(personId);
 
       commit(UPDATE_PERSON, { personId, updates: updatedUser });
