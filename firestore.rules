@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	function isMeAdmin() {
+  		return request.auth.uid != null && get(/databases/$(database)/documents/persons/$(request.auth.token.email)).data.isAdmin == true
+  	}
+    
+    match /{document=**} {
+      allow read: if request.auth.uid != null;
+      allow write: if isMeAdmin();
+    }
+    
+    match /document-links/{documents=**} {
+      allow read;
+    }
+  }
+}
