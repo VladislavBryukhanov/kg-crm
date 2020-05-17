@@ -280,6 +280,14 @@
       return isFormValid && (!this.isEditMode || isAnyUpdates);
     }
 
+    @Watch('persons', { immediate: true })
+    private async onPersonsChange(persons: Person[]) {
+      const { personId } = this.$router.currentRoute.params;
+      
+      if (personId) {
+        this.initPerson(personId, persons);
+      }
+    }
 
     @Watch('$route', { immediate: true })
     private async onRouteChange(to: Route, from: Route) {
@@ -293,12 +301,12 @@
       }
 
       if (!this.persons.find(({ id }) => id === personId)) {
-        this.loading = true;
-        await this.fetchPerson(personId);
-        this.loading = false;
+        return this.initPerson(personId, this.persons);
       }
 
-      this.initPerson(personId, this.persons);
+      this.loading = true;
+      await this.fetchPerson(personId);
+      this.loading = false;
     }
 
     private async created() {
@@ -308,8 +316,6 @@
         this.loading = true;
         await this.fetchPerson(personId);
         this.loading = false;
-
-        this.initPerson(personId, this.persons);
       }
 
       if (!this.positionOptions.length) {

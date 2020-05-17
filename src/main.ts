@@ -8,6 +8,10 @@ import '@/core/filters';
 
 Vue.config.productionTip = false;
 
+// TODO validate file uploading
+// TODO paging
+// TODO image resizing
+
 new Vue({
   store,
   router,
