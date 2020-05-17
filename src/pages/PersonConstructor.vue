@@ -266,6 +266,7 @@
     };
 
     loading = false;
+    isEditMode = false;
 
     personAvatar?: File;
 
@@ -279,40 +280,36 @@
       return isFormValid && (!this.isEditMode || isAnyUpdates);
     }
 
-    private get isEditMode() {
-      return !!this.$router.currentRoute.params.personId;
-    }
 
-    @Watch('persons', { immediate: true })
-    private onPersonsChanged(persons: Person[]) {
-      const { personId } = this.$router.currentRoute.params;
+    @Watch('$route', { immediate: true })
+    private async onRouteChange(to: Route, from: Route) {
+      const { personId } = to.params;
+      this.isEditMode = !!personId;
 
-      if (!personId || !this.persons.length) return;
+      if (!personId) {
+        this.person = { avatarUrl: '' }; // avatarUrl init value needed for reactivity
+        this.originalPerson = undefined;
+        return;
+      }
+
+      if (!this.persons.find(({ id }) => id === personId)) {
+        this.loading = true;
+        await this.fetchPerson(personId);
+        this.loading = false;
+      }
 
       this.initPerson(personId, this.persons);
     }
 
-    @Watch('$route')
-    private onRouteChange(to: Route, from: Route) {
-      const { personId } = to.params;
-
-      if (personId) {
-        if (!this.persons) {
-          return this.fetchPerson(personId);  
-        }
-
-        return this.initPerson(personId, this.persons);
-      }
-
-      this.person = { avatarUrl: '' }; // avatarUrl init value needed for reactivity
-      this.originalPerson = undefined;
-    }
-
-    private created() {
+    private async created() {
       const { personId } = this.$router.currentRoute.params;
 
       if (personId && !this.persons.find(({ id }) => id === personId)) {
-        this.fetchPerson(personId);
+        this.loading = true;
+        await this.fetchPerson(personId);
+        this.loading = false;
+
+        this.initPerson(personId, this.persons);
       }
 
       if (!this.positionOptions.length) {
@@ -329,12 +326,7 @@
 
       if (!this.originalPerson) return;
       
-      const { avatarUrl } = this.originalPerson;
-      
-      if (!avatarUrl) {
-        this.originalPerson.avatarUrl = '';
-      }
-
+      this.originalPerson.avatarUrl = this.originalPerson.avatarUrl || '';
       this.person = { ...this.originalPerson };
     }
 
