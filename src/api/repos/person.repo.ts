@@ -10,10 +10,6 @@ const PERSON_COLLECTION = 'persons';
 const USER_ROLES_COLLECTION = 'user-roles';
 
 class PersonRepo extends BaseRepo<Person> {
-  constructor() {
-    super(PERSON_COLLECTION);
-  }
-
   private async populateData(person: Person): Promise<Person> {
     const roleRef = db.collection(USER_ROLES_COLLECTION).doc(person.gmail);
 
@@ -85,4 +81,4 @@ class PersonRepo extends BaseRepo<Person> {
   }
 }
 
-export default new PersonRepo();
+export default new PersonRepo(PERSON_COLLECTION);
